@@ -2,6 +2,7 @@
 #define PIN_SENSOR_EAST A4
 #define PIN_SENSOR_WEST A5
 
+#define PIN_LED_BATT_STATE 3
 #define PIN_LED_MOTOR_STATE 4
 #define PIN_LED_PUMP_STATE 5
 

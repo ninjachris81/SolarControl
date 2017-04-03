@@ -15,7 +15,9 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 1000
 #else
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
-#endif  
+#endif
+
+#define BRIGHTNESS_DARK_LEVEL 500
 
 class BrightnessController : public AbstractIntervalTask {
 public:
@@ -28,6 +30,8 @@ public:
 
     int getSensorValueEast();
     int getSensorValueWest();
+
+    bool isDark();
     
 private:
   int sensorValueEast = 0;

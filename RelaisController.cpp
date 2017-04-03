@@ -11,10 +11,12 @@ void RelaisController::init() {
   pinMode(PIN_RELAIS_MOTOR_ON, OUTPUT);
   pinMode(PIN_RELAIS_MOTOR_UP, OUTPUT);
   pinMode(PIN_RELAIS_MOTOR_DOWN, OUTPUT);
+  pinMode(PIN_RELAIS_PUMP, OUTPUT);
   
   digitalWrite(PIN_RELAIS_MOTOR_ON, HIGH);
   digitalWrite(PIN_RELAIS_MOTOR_UP, HIGH);
   digitalWrite(PIN_RELAIS_MOTOR_DOWN, HIGH);
+  digitalWrite(PIN_RELAIS_PUMP, HIGH);
 }
 
 void RelaisController::update() {

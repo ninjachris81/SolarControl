@@ -8,6 +8,7 @@
 #endif
 
 #include "AbstractIntervalTask.h"
+#include "LedController.h"
 #include "Pins.h"
 #include "Debug.h"
 
@@ -15,13 +16,17 @@
 
 class BatteryController : public AbstractIntervalTask {
 public:
-    BatteryController();
+    BatteryController(LedController* ledController);
     virtual ~BatteryController();
 
     void init();
     
     void update2();
 
+    bool isUsingBattery();
+
+private:
+  LedController* ledController;
 };
 
 #endif /* BATTERYCONTROLLER_H */

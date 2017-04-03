@@ -17,6 +17,11 @@ public:
     }
   };
 
+protected:
+  void setInterval(uint16_t intervalMs) {
+    this->intervalMs = intervalMs;
+  }
+
   virtual void update2() = 0;
 
 private:

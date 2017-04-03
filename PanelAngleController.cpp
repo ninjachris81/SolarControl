@@ -1,8 +1,9 @@
 #include "PanelAngleController.h"
 
-PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
+PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
   this->brightnessController = brightnessController;
   this->relaisController = relaisController;
+  this->ledController = ledController;
 }
 
 PanelAngleController::~PanelAngleController() {
@@ -111,6 +112,7 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
   Serial.print(F(", direction: "));
   Serial.println(directionUp, DEC);
 #endif
+  ledController->setState(INDEX_LED_MOTOR_STATE, doEnable);
   
   if (doEnable) {
     relaisController->setState(PIN_RELAIS_MOTOR_ON, true);

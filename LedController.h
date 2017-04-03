@@ -10,8 +10,12 @@
 #include "AbstractIntervalTask.h"
 #include "Pins.h"
 
-#define LED_COUNT 2
+#define LED_COUNT 3
 #define BLINK_INTERVAL_MS 400
+
+#define INDEX_LED_BATT_STATE 0
+#define INDEX_LED_MOTOR_STATE 1
+#define INDEX_LED_PUMP_STATE 2
 
 class LedController : public AbstractIntervalTask {
 public:

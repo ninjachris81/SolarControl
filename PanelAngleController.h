@@ -10,6 +10,7 @@
 #include "AbstractIntervalTask.h"
 #include "BrightnessController.h"
 #include "RelaisController.h"
+#include "LedController.h"
 #include "Debug.h"
 
 #define UPDATE_PA_INTERVAL_MS 1000
@@ -35,7 +36,7 @@ public:
       AS_MAX = AS_EAST
     };
 
-    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController);
+    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController);
     virtual ~PanelAngleController();
 
     void init();
@@ -60,6 +61,7 @@ private:
   
   BrightnessController* brightnessController;
   RelaisController* relaisController;
+  LedController* ledController;
 
 };
 

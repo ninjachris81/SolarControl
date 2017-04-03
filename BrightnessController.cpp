@@ -21,3 +21,8 @@ int BrightnessController::getSensorValueEast() {
 int BrightnessController::getSensorValueWest() {
   return sensorValueWest;
 }
+
+bool BrightnessController::isDark() {
+  return sensorValueEast>BRIGHTNESS_DARK_LEVEL && sensorValueWest>BRIGHTNESS_DARK_LEVEL;
+}
+
