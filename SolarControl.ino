@@ -7,6 +7,7 @@
 #include "BatteryController.h"
 
 TaskManager taskManager;
+
 LedController ledController;
 BrightnessController brightnessController;
 RelaisController relaisController;

@@ -5,7 +5,7 @@ TaskManager::TaskManager() {
 }
 
 bool TaskManager::registerTask(AbstractTask *task) {
-  //if (taskCount>=MAX_TASK_COUNT) return false;    // max tasks reached
+  if (taskCount>=MAX_TASK_COUNT) return false;    // max tasks reached
   tasks[taskCount] = task;
   taskCount++;
   return true;
@@ -21,11 +21,13 @@ void TaskManager::init() {
 }
 
 void TaskManager::update() {
-  wdt_enable(WDTO_1S);
+  wdt_enable(WDTO_4S);
 
   for (uint8_t i=0; i<taskCount; i++) {
     tasks[i]->update();
     wdt_reset();
   }
+  
+  wdt_disable();
 }
 

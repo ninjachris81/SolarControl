@@ -49,14 +49,16 @@ void PanelAngleController::checkNewState() {
   }
 
   lastStates[newState]++;
+  lastStatesCount++;
 
 #ifdef IS_DEBUG
   Serial.print(F("Angle: "));
   Serial.println(newState, DEC);
 #endif
 
-  // check states commit
-  if (lastStates[newState]>=LAST_STATES_MIN_COUNT) {
+  if (lastStatesCount>=LAST_STATES_LIMIT) {
+    resetLastStates();
+  } else if (lastStates[newState]>=LAST_STATES_MIN_COUNT) {
     setState(newState);
     resetLastStates();
   }
@@ -80,6 +82,7 @@ void PanelAngleController::checkState() {
 
 void PanelAngleController::resetLastStates() {
   for (uint8_t i=0;i<PanelAngleController::AS_MAX;i++) lastStates[i] = 0;
+  lastStatesCount = 0;
 }
 
 void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {

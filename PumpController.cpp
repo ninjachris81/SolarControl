@@ -22,8 +22,19 @@ void PumpController::update2() {
     } else {
       setInterval(PUMP_STANDBY_INTERVAL_AC_MS);
     }
+
+    if (pumpOn) {
+      pumpOn = false;
+      pumpTimeout = 0;
+    } else {
+      pumpTimeout++;
+      if (pumpTimeout>=PUMP_TIMEOUT) {
+        pumpOn = true;
+        pumpTimeout = 0;
+      }
+    }
   
-    setState(!pumpOn);  
+    setState(pumpOn);  
   } else {
     setState(true);
   }

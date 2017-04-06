@@ -12,7 +12,14 @@
 #include "Pins.h"
 #include "Debug.h"
 
-#define UPDATE_BATTERY_INTERVAL_MS 3000
+#ifdef IS_DEBUG
+  #define UPDATE_BATTERY_INTERVAL_MS 1000
+#else
+  #define UPDATE_BATTERY_INTERVAL_MS 3000
+#endif
+
+#define R1 30000.0
+#define R2 7500.0
 
 class BatteryController : public AbstractIntervalTask {
 public:
@@ -26,6 +33,8 @@ public:
     bool isUsingBattery();
 
 private:
+  float currentVoltage = 0;
+
   LedController* ledController;
 };
 

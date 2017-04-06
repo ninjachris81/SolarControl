@@ -1,4 +1,6 @@
 
+#define PIN_BATTERY_VOLTAGE A1
+
 #define PIN_SENSOR_EAST A4
 #define PIN_SENSOR_WEST A5
 
