@@ -1,7 +1,7 @@
 #include "LedController.h"
 
 LedController::LedController() : AbstractIntervalTask(BLINK_INTERVAL_MS) {
-  for (uint8_t i=0;i<LED_COUNT;i++) blinkingLeds[i] = false;
+  for (uint8_t i = 0; i < LED_COUNT; i++) ledStates[i] = LED_OFF;
 }
 
 LedController::~LedController() {
@@ -11,41 +11,53 @@ void LedController::init() {
   pinMode(PIN_LED_MOTOR_STATE, OUTPUT);
   pinMode(PIN_LED_PUMP_STATE, OUTPUT);
   pinMode(PIN_LED_BATT_STATE, OUTPUT);
+
+  setState(INDEX_LED_BATT_STATE, LED_OFF);
+  setState(INDEX_LED_MOTOR_STATE, LED_OFF);
+  setState(INDEX_LED_PUMP_STATE, LED_OFF);
 }
 
 void LedController::update2() {
-  for (uint8_t i=0;i<LED_COUNT;i++) {
-    if (blinkingLeds[i]) {
-      uint8_t ledState = digitalRead(i);
-      if (ledState == LOW) {
-        ledState = HIGH;
-      } else {
-        ledState = LOW;
-      }
-  
-      digitalWrite(i, ledState);
+  for (uint8_t i = 0; i < LED_COUNT; i++) {
+    if (ledStates[i] == LED_BLINK) {
+      int pin = getPin(i);
+      digitalWrite(pin, !digitalRead(pin));
     }
   }
 }
 
-void LedController::setState(uint8_t index, bool isOn) {
-  uint8_t pin = 0;
-  
-  switch(index) {
-    case INDEX_LED_BATT_STATE:
-      pin = PIN_LED_BATT_STATE;
-      break;
-    case INDEX_LED_MOTOR_STATE:
-      pin = PIN_LED_MOTOR_STATE;
-      break;
-    case INDEX_LED_PUMP_STATE:
-      pin = PIN_LED_PUMP_STATE;
-      break;
+void LedController::setState(uint8_t index, bool state) {
+  if (state) {
+    setState(index, LED_ON);
+  } else {
+    setState(index, LED_OFF);
   }
-  
-  if (pin>0) digitalWrite(pin, isOn);
 }
 
-void LedController::setBlinking(uint8_t index, bool isBlinking) {
-  blinkingLeds[index] = isBlinking;
+void LedController::setState(uint8_t index, LED_STATE state) {
+  if (ledStates[index] == state) return;
+
+  ledStates[index] = state;
+
+  switch (state) {
+    case LED_OFF:
+      digitalWrite(getPin(index), LOW);
+      break;
+    case LED_ON:
+      digitalWrite(getPin(index), HIGH);
+      break;
+  }
+}
+
+int LedController::getPin(uint8_t index) {
+  switch (index) {
+    case INDEX_LED_BATT_STATE:
+      return PIN_LED_BATT_STATE;
+    case INDEX_LED_MOTOR_STATE:
+      return PIN_LED_MOTOR_STATE;
+    case INDEX_LED_PUMP_STATE:
+      return PIN_LED_PUMP_STATE;
+  }
+
+  return -1;
 }

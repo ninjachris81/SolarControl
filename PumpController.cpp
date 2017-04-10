@@ -51,3 +51,8 @@ void PumpController::setState(bool pumpOn) {
   relaisController->setState(PIN_RELAIS_PUMP, pumpOn);
 }
 
+bool PumpController::getState() {
+  return pumpOn;
+}
+
+

@@ -28,14 +28,12 @@ public:
     
     void update2();
 
-    int getSensorValueEast();
-    int getSensorValueWest();
+    int getSensorValue();
 
     bool isDark();
     
 private:
-  int sensorValueEast = 0;
-  int sensorValueWest = 0;
+  int sensorValue = 0;
 
 };
 

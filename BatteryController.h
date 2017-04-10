@@ -9,6 +9,7 @@
 
 #include "AbstractIntervalTask.h"
 #include "LedController.h"
+#include "RelaisController.h"
 #include "Pins.h"
 #include "Debug.h"
 
@@ -21,10 +22,20 @@
 #define R1 30000.0
 #define R2 7500.0
 
+#define USING_BATTERY_VOLTAGE 12.0
+#define CRITICAL_BATTERY_VOLTAGE 10.0
+
 class BatteryController : public AbstractIntervalTask {
 public:
-    BatteryController(LedController* ledController);
+    BatteryController(LedController* ledController, RelaisController* relaisController);
     virtual ~BatteryController();
+
+  enum BATT_STATE {
+    BATT_INIT,
+    BATT_OK,
+    BATT_CANNOT_USE,
+    BATT_CRITICAL
+  };
 
     void init();
     
@@ -32,10 +43,14 @@ public:
 
     bool isUsingBattery();
 
+    bool isBatteryCritical();
+
 private:
+  BATT_STATE battState = BATT_INIT;
   float currentVoltage = 0;
 
   LedController* ledController;
+  RelaisController* relaisController;
 };
 
 #endif /* BATTERYCONTROLLER_H */

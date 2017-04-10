@@ -11,7 +11,7 @@ public:
 
   void update() {
     unsigned long currentMillis = millis();
-    if (currentMillis - lastUpdate >= intervalMs) {
+    if (currentMillis - lastUpdate >= intervalMs) {      
       lastUpdate = currentMillis;
       update2();
     }

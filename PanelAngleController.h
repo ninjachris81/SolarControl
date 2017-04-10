@@ -11,6 +11,7 @@
 #include "BrightnessController.h"
 #include "RelaisController.h"
 #include "LedController.h"
+#include "TimeController.h"
 #include "Debug.h"
 
 #define UPDATE_PA_INTERVAL_MS 1000
@@ -26,8 +27,6 @@
 #endif
 
 #define BRIGHTNESS_GLOBAL_THRESHOLD 100
-#define BRIGHTNESS_DELTA_EAST -20
-#define BRIGHTNESS_DELTA_WEST 20
 
 class PanelAngleController : public AbstractIntervalTask {
 public:
@@ -38,7 +37,7 @@ public:
       AS_MAX = AS_EAST
     };
 
-    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController);
+    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController *timeController);
     virtual ~PanelAngleController();
 
     void init();
@@ -48,6 +47,8 @@ public:
     void setState(ANGLE_STATE state);
 
     void resetLastStates();
+
+    ANGLE_STATE getState();
 
 private:
   void checkNewState();
@@ -66,6 +67,7 @@ private:
   BrightnessController* brightnessController;
   RelaisController* relaisController;
   LedController* ledController;
+  TimeController *timeController;
 
 };
 

@@ -1,9 +1,10 @@
 #include "PanelAngleController.h"
 
-PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
+PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController *timeController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
   this->brightnessController = brightnessController;
   this->relaisController = relaisController;
   this->ledController = ledController;
+  this->timeController = timeController;
 }
 
 PanelAngleController::~PanelAngleController() {
@@ -24,22 +25,20 @@ void PanelAngleController::update2() {
 void PanelAngleController::checkNewState() {
   PanelAngleController::ANGLE_STATE newState = AS_DEFAULT;
   
-  int sve = brightnessController->getSensorValueEast();
-  int svw = brightnessController->getSensorValueWest();
+  int brightness = brightnessController->getSensorValue();
 
 #ifdef IS_DEBUG
-  Serial.print(F("EAST: "));
-  Serial.println(sve, DEC);
-  Serial.print(F("WEST: "));
-  Serial.println(svw, DEC);
+  Serial.print(F("Brightness: "));
+  Serial.print(brightness, DEC);
 #endif
 
-  if (sve<BRIGHTNESS_GLOBAL_THRESHOLD || svw<BRIGHTNESS_GLOBAL_THRESHOLD) {
-    int delta = sve-svw;
-    
-    if (delta < BRIGHTNESS_DELTA_EAST) {
+  if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
+
+    // TODO: switch by time
+
+    if (1==1) {
       newState = AS_EAST;
-    } else if (delta > BRIGHTNESS_DELTA_WEST) {
+    } else if (1==2) {
       newState = AS_DEFAULT;
     } else {
       newState = AS_MIDDLE;
@@ -52,7 +51,7 @@ void PanelAngleController::checkNewState() {
   lastStatesCount++;
 
 #ifdef IS_DEBUG
-  Serial.print(F("Angle: "));
+  Serial.print(F(", Angle: "));
   Serial.println(newState, DEC);
 #endif
 
@@ -108,6 +107,11 @@ void PanelAngleController::setMotorState(bool doEnable) {
   setMotorState(doEnable, false);
 }
 
+PanelAngleController::ANGLE_STATE PanelAngleController::getState() {
+  return currentState;
+}
+
+
 void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
 #ifdef IS_DEBUG
   Serial.print(F("Setting motor state: "));
@@ -115,6 +119,7 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
   Serial.print(F(", direction: "));
   Serial.println(directionUp, DEC);
 #endif
+
   ledController->setState(INDEX_LED_MOTOR_STATE, doEnable);
   
   if (doEnable) {

@@ -10,19 +10,14 @@ void BrightnessController::init() {
 }
 
 void BrightnessController::update2() {
-  sensorValueEast = analogRead(PIN_SENSOR_EAST);
-  sensorValueWest = analogRead(PIN_SENSOR_WEST);
+  sensorValue = analogRead(PIN_BRIGHTNESS_SENSOR);
 }
 
-int BrightnessController::getSensorValueEast() {
-  return sensorValueEast;
-}
-
-int BrightnessController::getSensorValueWest() {
-  return sensorValueWest;
+int BrightnessController::getSensorValue() {
+  return sensorValue;
 }
 
 bool BrightnessController::isDark() {
-  return sensorValueEast>BRIGHTNESS_DARK_LEVEL && sensorValueWest>BRIGHTNESS_DARK_LEVEL;
+  return sensorValue>BRIGHTNESS_DARK_LEVEL;
 }
 

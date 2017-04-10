@@ -38,6 +38,8 @@ public:
 
     void setState(bool pumpOn);
 
+    bool getState();
+
 private:
   bool pumpOn = false;
   uint8_t pumpTimeout = 0;
