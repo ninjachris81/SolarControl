@@ -7,20 +7,30 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractTask.h"
+#include "AbstractIntervalTask.h"
 #include "Pins.h"
+#include <TimeLib.h>
+#include <DCF77.h>
 
-class TimeController : public AbstractTask {
+#define DCF_PIN 2           // Connection pin to DCF 77 device
+#define DCF_INTERRUPT 0    // Interrupt number associated with pin
+
+class TimeController : public AbstractIntervalTask {
 public:
     TimeController();
     virtual ~TimeController();
 
     void init();
     
-    void update();
+    void update2();
+
+    bool isTimeSynced();
+
+    uint8_t getHourOfDay();
 
 private:
-
+  bool timeSynced = false;
+  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
 };
 
 #endif /* TIMECONTROLLER_H */

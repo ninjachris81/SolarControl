@@ -12,6 +12,10 @@ void BatteryController::init() {
   pinMode(PIN_BATTERY_VOLTAGE, INPUT);
 }
 
+float BatteryController::getVoltage() {
+  return currentVoltage;
+}
+
 void BatteryController::update2() {
   float vout = (analogRead(PIN_BATTERY_VOLTAGE) * 5.0) / 1024.0;
   currentVoltage = vout / (R2/(R1+R2));

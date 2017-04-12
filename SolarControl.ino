@@ -1,4 +1,6 @@
 #include <LedControl.h>
+#include <TimeLib.h>
+#include <DCF77.h>
 
 #include "TaskManager.h"
 #include "TimeController.h"
@@ -21,7 +23,7 @@ RelaisController relaisController;
 PanelAngleController panelAngleController(&brightnessController, &relaisController, &ledController, &timeController);
 BatteryController batteryController(&ledController, &relaisController);
 PumpController pumpController(&relaisController, &ledController, &batteryController, &brightnessController);
-DisplayController displayController(&buttonController, &brightnessController, &batteryController, &panelAngleController, &pumpController);
+DisplayController displayController(&buttonController, &brightnessController, &batteryController, &panelAngleController, &pumpController, &timeController);
 
 void setup() {
   Serial.begin(115200);
@@ -35,7 +37,7 @@ void setup() {
   taskManager.registerTask(&batteryController);
   taskManager.registerTask(&pumpController);
   taskManager.registerTask(&displayController);
-  
+
   taskManager.init();
 }
 

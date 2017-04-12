@@ -7,23 +7,12 @@ ButtonController::~ButtonController() {
 }
 
 void ButtonController::init() {
-  pinMode(PIN_BUTTON, INPUT);
 }
 
 void ButtonController::update() {
-  if (!buttonClicked) {
-    if (digitalRead(PIN_BUTTON)) {
-      buttonClicked = true;
-    }
-  }
+  joystick.update();
 }
 
-bool ButtonController::consumeButtonClick() {
-  if (buttonClicked) {
-    buttonClicked = false;
-    return true;
-  } else {
-    return false;
-  }
+void ButtonController::setJoystickHandler(JoystickHandler::JoystickFeedbackHandler *handler) {
+  joystick.setFeedbackHandler(handler);
 }
-

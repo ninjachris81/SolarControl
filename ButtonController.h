@@ -7,8 +7,10 @@
 #include "WProgram.h"
 #endif
 
+
 #include "AbstractTask.h"
 #include "Pins.h"
+#include "joystick_handler.h"
 
 class ButtonController : public AbstractTask {
 public:
@@ -19,11 +21,10 @@ public:
     
     void update();
 
-    bool consumeButtonClick();
+    void setJoystickHandler(JoystickHandler::JoystickFeedbackHandler *handler);
 
 private:
-  bool buttonClicked = false;
-
+  JoystickHandler joystick = JoystickHandler(PIN_BUTTON_X, PIN_BUTTON_Y, PIN_BUTTON_BTN);
 };
 
 #endif /* BUTTONCONTROLLER_H */

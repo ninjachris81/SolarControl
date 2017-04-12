@@ -34,14 +34,18 @@ void PanelAngleController::checkNewState() {
 
   if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
 
-    // TODO: switch by time
-
-    if (1==1) {
-      newState = AS_EAST;
-    } else if (1==2) {
-      newState = AS_DEFAULT;
+    if (timeController->isTimeSynced()) {
+      uint8_t h = timeController->getHourOfDay();
+  
+      if (h>=8 && h<=10) {    // 8 to 10
+        newState = AS_EAST;
+      } else if (h>=11 && h<=14) {   // 11 to 14
+        newState = AS_MIDDLE;
+      } else {
+        newState = AS_DEFAULT;
+      }
     } else {
-      newState = AS_MIDDLE;
+      newState = AS_DEFAULT;    // no time
     }
   } else {
     newState = AS_DEFAULT;    // too dark, go default
@@ -110,7 +114,6 @@ void PanelAngleController::setMotorState(bool doEnable) {
 PanelAngleController::ANGLE_STATE PanelAngleController::getState() {
   return currentState;
 }
-
 
 void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
 #ifdef IS_DEBUG

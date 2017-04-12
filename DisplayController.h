@@ -14,11 +14,12 @@
 #include "BatteryController.h"
 #include "PanelAngleController.h"
 #include "PumpController.h"
+#include "TimeController.h"
 
 #include "Debug.h"
 #include "Pins.h"
 
-#define DISPLAY_BRIGHTNESS 8
+#define DISPLAY_BRIGHTNESS 4
 
 #ifdef IS_DEBUG
   #define DISPLAY_TIMEOUT_MS 20
@@ -29,7 +30,7 @@
 #define DEFAULT_DISPLAY_ADDR 0
 
 
-class DisplayController : public AbstractIntervalTask {
+class DisplayController : public AbstractIntervalTask, public JoystickHandler::JoystickFeedbackHandler {
 public:
   enum DISPLAY_CONTENT {
     DC_TIME,
@@ -41,22 +42,29 @@ public:
     DC_MIN = DC_TIME
   };
 
-    DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController);
+    DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController, TimeController* timeController);
     virtual ~DisplayController();
 
     void init();
     
     void update2();
 
-
+    void onLeft(bool isDown);
+    void onRight(bool isDown);
+    void onUp(bool isDown);
+    void onDown(bool isDown);
+    void onPressed(bool isDown);
+    
 private:
   ButtonController* buttonController;
   BrightnessController* brightnessController;
   BatteryController* batteryController;
   PanelAngleController* panelAngleController;
   PumpController* pumpController;
+  TimeController* timeController;
 
   void printNumber(int addr, int v);
+  void printNumber(int addr, float v);
   void printBool(int addr, bool v, uint8_t offset);
 
   bool displayOn = true;

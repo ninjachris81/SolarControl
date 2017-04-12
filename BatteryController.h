@@ -45,6 +45,8 @@ public:
 
     bool isBatteryCritical();
 
+    float getVoltage();
+
 private:
   BATT_STATE battState = BATT_INIT;
   float currentVoltage = 0;
