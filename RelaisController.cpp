@@ -17,6 +17,8 @@ void RelaisController::init() {
   digitalWrite(PIN_RELAIS_MOTOR_UP, HIGH);
   digitalWrite(PIN_RELAIS_MOTOR_DOWN, HIGH);
   digitalWrite(PIN_RELAIS_PUMP, HIGH);
+
+  //setState(PIN_RELAIS_MOTOR_DOWN, true);
 }
 
 void RelaisController::update() {

@@ -1,7 +1,9 @@
 #include "DisplayController.h"
 #include "Debug.h"
+#include <TimeLib.h>
+#include <math.h>
 
-DisplayController::DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController, TimeController* timeController) : AbstractIntervalTask(1000) {
+DisplayController::DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* , TimeController* timeController) : AbstractIntervalTask(1000) {
   this->buttonController = buttonController;
   this->brightnessController = brightnessController;
   this->batteryController = batteryController;
@@ -24,11 +26,8 @@ void DisplayController::update2() {
   Serial.println(displayTimeout, DEC);
   if (displayTimeout>0) displayTimeout--;
   setDisplayOn(displayTimeout>0);
-
   updateDisplay();
 }
-
-
 
 void DisplayController::updateDisplay() {
   if (!displayOn) return;
@@ -39,42 +38,64 @@ void DisplayController::updateDisplay() {
 
   switch(displayContent) {
     case DC_TIME:
-      if (timeController->isTimeSynced()) {
+      if (!timeController->isTimeSynced()) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 5, 'n', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'o', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, '5', false);
-        ledControl.setRow(DEFAULT_DISPLAY_ADDR, 2, 0x1c);
+        ledControl.setRow(DEFAULT_DISPLAY_ADDR, 2, 0x33);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 1, 'n', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 0, 'c', false);
       } else {
-        printNumber(DEFAULT_DISPLAY_ADDR, millis());
+        if (hour()<10) printNumber(DEFAULT_DISPLAY_ADDR, 0, 3);
+        printNumber(DEFAULT_DISPLAY_ADDR, hour(), 2, true);
+        
+        if (minute()<10) printNumber(DEFAULT_DISPLAY_ADDR, 0, 1);
+        printNumber(DEFAULT_DISPLAY_ADDR, minute(), 0);
       }
       break;
     case DC_BRIGHTNESS:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x05);
-      printNumber(DEFAULT_DISPLAY_ADDR, brightnessController->getSensorValue());
+      printNumber(DEFAULT_DISPLAY_ADDR, brightnessController->getSensorValue(), 0);
       break;
     case DC_BATTERY:
       if (batteryController->isUsingBattery()) {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 1, 'b', false);
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 0, 'a', batteryController->isBatteryCritical());
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', batteryController->isBatteryCritical());
       } else {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 1, 'a', false);
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 0, 'c', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'a', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'c', false);
       }
 
-      printNumber(DEFAULT_DISPLAY_ADDR, 12.34);
-      //printNumber(DEFAULT_DISPLAY_ADDR, batteryController->getVoltage());
+      //printNumber(DEFAULT_DISPLAY_ADDR, (float)12.34, 0);
+      printNumber(DEFAULT_DISPLAY_ADDR, batteryController->getVoltage(), 0);
+
       break;
     case DC_PANEL_ANGLE:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', false);
-      printNumber(DEFAULT_DISPLAY_ADDR, panelAngleController->getState());
+      if (panelAngleController->getMotorState()<0) {
+        ledControl.setRow(DEFAULT_DISPLAY_ADDR,4,0x3e);     //u
+        ledControl.setRow(DEFAULT_DISPLAY_ADDR,3,0x67);     //p
+      } else if (panelAngleController->getMotorState()>0) {
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'd', false);
+        ledControl.setRow(DEFAULT_DISPLAY_ADDR, 3, 0x1d);
+      } else {
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, ' ', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
+      }
+
+      ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 0, panelAngleController->getState(), false);
       break;
     case DC_PUMP:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);
+
+      if (pumpController->hasOverride()) {
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'o', false);
+      } else {
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, ' ', false);
+      }
       printBool(DEFAULT_DISPLAY_ADDR, pumpController->getState(), 0);
       break;
   }
@@ -91,7 +112,11 @@ void DisplayController::printBool(int addr, bool v, uint8_t offset) {
   }
 }
 
-void DisplayController::printNumber(int addr, int v) {
+void DisplayController::printNumber(int addr, int v, uint8_t offset) {
+  printNumber(addr, v, offset, false);
+}
+
+void DisplayController::printNumber(int addr, int v, uint8_t offset, bool withDot) {
   int ones;
   int tens;
   int hundreds;
@@ -108,52 +133,55 @@ void DisplayController::printNumber(int addr, int v) {
   tens = v % 10;
   v = v / 10;
   hundreds = v;
+  
   if (negative) {
-    //print character '-' in the leftmost column
-    ledControl.setChar(addr, 3, '-', false);
+    if (hundreds>0) {
+      ledControl.setChar(addr, offset+3, '-', false);
+    } else if (tens>0) {
+      ledControl.setChar(addr, offset+2, '-', false);
+    } else {
+      ledControl.setChar(addr, offset+1, '-', false);
+    }
   }
-  else {
-    //print a blank in the sign column
-    ledControl.setChar(addr, 3, ' ', false);
-  }
+  
   //Now print the number digit by digit
-  if (hundreds>0) ledControl.setDigit(addr, 2, (byte)hundreds, false);
-  if (tens>0 || hundreds>0) ledControl.setDigit(addr, 1, (byte)tens, false);
-  ledControl.setDigit(addr, 0, (byte)ones, false);
+  if (hundreds>0) ledControl.setDigit(addr, offset+2, (byte)hundreds, false);
+  if (tens>0 || hundreds>0) ledControl.setDigit(addr, offset+1, (byte)tens, false);
+  ledControl.setDigit(addr, offset, (byte)ones, withDot);
 }
 
-void DisplayController::printNumber(int addr, float v) {
+void DisplayController::printNumber(int addr, float v, uint8_t offset) {
   float ones;
   float tens;
-  float hundreds;
-
-  float f1;
-  float f2;
+  
   boolean negative = false;
-
+  
   if (v < -999 || v > 999)
     return;
   if (v < 0) {
     negative = true;
     v = v * -1;
   }
-  ones = v % 10;
-  v = v / 10;
-  tens = v % 10;
-  v = v / 10;
-  hundreds = v;
-  if (negative) {
-    //print character '-' in the leftmost column
-    ledControl.setChar(addr, 5, '-', false);
-  }
-  else {
-    //print a blank in the sign column
-    ledControl.setChar(addr, 5, ' ', false);
-  }
-  //Now print the number digit by digit
-  ledControl.setDigit(addr, 2, (byte)hundreds, false);
-  ledControl.setDigit(addr, 1, (byte)tens, false);
-  ledControl.setDigit(addr, 0, (byte)ones, false);
+
+  double d;
+  int i;
+  float fract = modf(v, &d);
+  i = d;
+
+  Serial.println(i, DEC);
+  
+  printNumber(addr, i, offset+2, true);
+  //ledControl.setRow(DEFAULT_DISPLAY_ADDR,offset+2,0x80);    // add the dot
+
+  i = fract*100;
+  Serial.println(i, DEC);
+
+  ones = i % 10;
+  i = i / 10;
+  tens = i % 10;
+  
+  ledControl.setDigit(addr, offset+1, (byte)tens, false);
+  ledControl.setDigit(addr, offset, (byte)ones, false);
 }
 
 void DisplayController::setDisplayOn(bool newDisplayOn) {
@@ -167,41 +195,56 @@ void DisplayController::setDisplayOn(bool newDisplayOn) {
 }
 
 void DisplayController::onLeft(bool isDown) {
-  if (isDown) {
-    if (displayOn) {
-      if (displayContent==DC_MIN) {
-        displayContent = DC_MAX;
-      } else {
-        displayContent--;
-      }
-    }
-    displayTimeout = DISPLAY_TIMEOUT_MS;
-    Serial.print(F("Display Mode: "));
-    Serial.println(displayContent, DEC);
-  }
+  onLeftRight(isDown, -1);
 }
 
 void DisplayController::onRight(bool isDown) {
+  onLeftRight(isDown, 1);
+}
+
+void DisplayController::onLeftRight(bool isDown, int dir){
+  displayTimeout = DISPLAY_TIMEOUT_MS;
+
   if (isDown) {
     if (displayOn) {
-      if (displayContent==DC_MAX) {
-        displayContent = DC_MIN;
+      if (dir>0 && displayContent==DC_MAX) {
+          displayContent = DC_MIN;
+      } else if (dir<0 && displayContent==DC_MIN) {
+          displayContent = DC_MAX;
       } else {
-        displayContent++;
+          displayContent+=dir;
       }
     }
-    displayTimeout = DISPLAY_TIMEOUT_MS;
-    Serial.print(F("Display Mode: "));
-    Serial.println(displayContent, DEC);
+  }
+}
+
+void DisplayController::onUpDown(bool isDown, int dir) {
+  displayTimeout = DISPLAY_TIMEOUT_MS;
+  bool directionUp;
+  directionUp = dir<0;
+
+  switch(displayContent) {
+    case DC_TIME:
+      break;
+    case DC_BRIGHTNESS:
+      break;
+    case DC_BATTERY:
+      break;
+    case DC_PANEL_ANGLE:
+      panelAngleController->overrideMotorState(isDown, directionUp);
+      break;
+    case DC_PUMP:
+      pumpController->overrideState(isDown, directionUp);
+      break;
   }
 }
 
 void DisplayController::onUp(bool isDown) {
-  
+  onUpDown(isDown, -1);
 }
 
 void DisplayController::onDown(bool isDown) {
-  
+  onUpDown(isDown, 1);
 }
 
 void DisplayController::onPressed(bool isDown) {

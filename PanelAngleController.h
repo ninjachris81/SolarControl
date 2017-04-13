@@ -34,7 +34,8 @@ public:
       AS_DEFAULT,
       AS_MIDDLE,
       AS_EAST,
-      AS_MAX = AS_EAST
+      AS_MAX = AS_EAST,
+      AS_OVERRIDE
     };
 
     PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController *timeController);
@@ -50,11 +51,18 @@ public:
 
     ANGLE_STATE getState();
 
+    int getMotorState();
+
+    void overrideMotorState(bool doEnable, bool directionUp);
+
 private:
   void checkNewState();
   void checkState();
   void setMotorState(bool doEnable);
   void setMotorState(bool doEnable, bool directionUp);
+
+  bool isMotorOverride = false;
+  int currentMotorState = 0;
 
   unsigned long lastUpdate = 0;
   ANGLE_STATE currentState = AS_DEFAULT;

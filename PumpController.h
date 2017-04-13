@@ -40,7 +40,13 @@ public:
 
     bool getState();
 
+    void overrideState(bool isOverride, bool pumpOn);
+
+    bool hasOverride();
+
 private:
+  bool isOverride = false;
+  
   bool pumpOn = false;
   uint8_t pumpTimeout = 0;
   

@@ -63,15 +63,27 @@ private:
   PumpController* pumpController;
   TimeController* timeController;
 
-  void printNumber(int addr, int v);
-  void printNumber(int addr, float v);
+  void printNumber(int addr, int v, uint8_t offset);
+  void printNumber(int addr, int v, uint8_t offset, bool withDot);
+  void printNumber(int addr, float v, uint8_t offset);
   void printBool(int addr, bool v, uint8_t offset);
 
   bool displayOn = true;
   int displayContent = DC_TIME;
   uint16_t displayTimeout = DISPLAY_TIMEOUT_MS;
 
+  void onLeftRight(bool isDown, int dir);
+  void onUpDown(bool isDown, int dir);
+
   LedControl ledControl = LedControl(PIN_DISPLAY_DIN,PIN_DISPLAY_CLK,PIN_DISPLAY_CS,1);
+  /*
+   *  PIN MAPPING:
+   *   -    |    7
+   *  | |   |  2   6
+   *   -    |    1
+   *  | |   |  3   5
+   *   - .  |    4 8
+   */
 
   void setDisplayOn(bool newDisplayOn);
   void updateDisplay();

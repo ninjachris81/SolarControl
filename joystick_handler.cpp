@@ -21,7 +21,7 @@ void JoystickHandler::update() {
   short x = analogRead(pinX);
   short y = analogRead(pinY);
   uint8_t btn = digitalRead(pinBtn);
-  
+
   if (btn==HIGH) {
     if (!BIT_CHECK(state,STATE_BUTTON)) {
       BIT_SET(state, STATE_BUTTON);
@@ -63,15 +63,15 @@ void JoystickHandler::update() {
     // handle vert
     if ((y < CENTER_VALUE - VALUE_THRESHOLD)) {
       // down
-      if (!BIT_CHECK(state,STATE_DOWN)) {
-        BIT_SET(state,STATE_DOWN);
-        if (feedbackHandler!=NULL) feedbackHandler->onDown(true);
-      }
-    } else if ((y > CENTER_VALUE + VALUE_THRESHOLD)) {
-      // up
       if (!BIT_CHECK(state,STATE_UP)) {
         BIT_SET(state,STATE_UP);
         if (feedbackHandler!=NULL) feedbackHandler->onUp(true);
+      }
+    } else if ((y > CENTER_VALUE + VALUE_THRESHOLD)) {
+      // up
+      if (!BIT_CHECK(state,STATE_DOWN)) {
+        BIT_SET(state,STATE_DOWN);
+        if (feedbackHandler!=NULL) feedbackHandler->onDown(true);
       }
     } else {
 

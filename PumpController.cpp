@@ -12,9 +12,15 @@ PumpController::~PumpController() {
 
 void PumpController::init() {
   setState(false);
+  isOverride = false;
+  Serial.print("OVERRIDE: ");
+  Serial.println(isOverride, DEC);
+
 }
 
 void PumpController::update2() {
+  //if (isOverride) return;
+  
   if (brightnessController->isDark()) {
     Serial.println(F("It's dark"));
     if (batteryController->isUsingBattery()) {
@@ -38,6 +44,17 @@ void PumpController::update2() {
   } else {
     setState(true);
   }
+}
+bool PumpController::hasOverride() {
+  Serial.print("OVERRIDE: ");
+  Serial.println(isOverride, DEC);
+  //return isOverride;
+  return false;
+}
+
+void PumpController::overrideState(bool isOverride, bool pumpOn) {
+  this->isOverride = isOverride;
+  setState(pumpOn);
 }
 
 void PumpController::setState(bool pumpOn) {

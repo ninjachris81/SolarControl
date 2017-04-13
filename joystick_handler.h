@@ -9,7 +9,7 @@
 
 
 #define CENTER_VALUE 518
-#define VALUE_THRESHOLD 20
+#define VALUE_THRESHOLD 80
 
 #define STATE_LEFT 1
 #define STATE_RIGHT 2

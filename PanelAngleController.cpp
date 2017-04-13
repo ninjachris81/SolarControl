@@ -15,6 +15,8 @@ void PanelAngleController::init() {
 }
 
 void PanelAngleController::update2() {
+  if (isMotorOverride) return;
+  
   if (isAdjustingAngle) {
     checkState();
   } else {
@@ -107,13 +109,28 @@ void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {
   currentState = state;
 }
 
+int PanelAngleController::getMotorState() {
+  return currentMotorState;
+}
+
+
 void PanelAngleController::setMotorState(bool doEnable) {
   setMotorState(doEnable, false);
 }
 
 PanelAngleController::ANGLE_STATE PanelAngleController::getState() {
-  return currentState;
+  if (isMotorOverride) {
+    return AS_OVERRIDE;
+  } else {
+    return currentState;
+  }
 }
+
+void PanelAngleController::overrideMotorState(bool doEnable, bool directionUp) {
+  isMotorOverride = doEnable;
+  setMotorState(doEnable, directionUp);
+}
+
 
 void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
 #ifdef IS_DEBUG
@@ -122,6 +139,15 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
   Serial.print(F(", direction: "));
   Serial.println(directionUp, DEC);
 #endif
+  if (!doEnable) {
+    currentMotorState = 0;
+  } else {
+    if (directionUp) {
+      currentMotorState = -1;
+    } else {
+      currentMotorState = 1;
+    }
+  }
 
   ledController->setState(INDEX_LED_MOTOR_STATE, doEnable);
   
