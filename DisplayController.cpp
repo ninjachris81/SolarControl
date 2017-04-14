@@ -3,13 +3,13 @@
 #include <TimeLib.h>
 #include <math.h>
 
-DisplayController::DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* , TimeController* timeController) : AbstractIntervalTask(1000) {
+DisplayController::DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController, TimeController* timeController) : AbstractIntervalTask(1000) {
   this->buttonController = buttonController;
   this->brightnessController = brightnessController;
   this->batteryController = batteryController;
   this->panelAngleController = panelAngleController;
   this->pumpController = pumpController;
-
+  
   this->buttonController->setJoystickHandler(this);
 }
 
@@ -23,7 +23,6 @@ void DisplayController::init() {
 }
 
 void DisplayController::update2() {
-  Serial.println(displayTimeout, DEC);
   if (displayTimeout>0) displayTimeout--;
   setDisplayOn(displayTimeout>0);
   updateDisplay();
@@ -33,8 +32,6 @@ void DisplayController::updateDisplay() {
   if (!displayOn) return;
 
   ledControl.clearDisplay(DEFAULT_DISPLAY_ADDR);
-
-  //ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, displayContent, true);
 
   switch(displayContent) {
     case DC_TIME:
@@ -59,13 +56,8 @@ void DisplayController::updateDisplay() {
       printNumber(DEFAULT_DISPLAY_ADDR, brightnessController->getSensorValue(), 0);
       break;
     case DC_BATTERY:
-      if (batteryController->isUsingBattery()) {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', batteryController->isBatteryCritical());
-      } else {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'a', false);
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'c', false);
-      }
+      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
+      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', batteryController->isBatteryCritical());
 
       //printNumber(DEFAULT_DISPLAY_ADDR, (float)12.34, 0);
       printNumber(DEFAULT_DISPLAY_ADDR, batteryController->getVoltage(), 0);
@@ -168,13 +160,9 @@ void DisplayController::printNumber(int addr, float v, uint8_t offset) {
   float fract = modf(v, &d);
   i = d;
 
-  Serial.println(i, DEC);
-  
   printNumber(addr, i, offset+2, true);
-  //ledControl.setRow(DEFAULT_DISPLAY_ADDR,offset+2,0x80);    // add the dot
 
   i = fract*100;
-  Serial.println(i, DEC);
 
   ones = i % 10;
   i = i / 10;

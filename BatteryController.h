@@ -22,8 +22,7 @@
 #define R1 30000.0
 #define R2 7500.0
 
-#define USING_BATTERY_VOLTAGE 12.0
-#define CRITICAL_BATTERY_VOLTAGE 10.0
+#define CRITICAL_BATTERY_VOLTAGE 11.0
 
 class BatteryController : public AbstractIntervalTask {
 public:
@@ -33,15 +32,12 @@ public:
   enum BATT_STATE {
     BATT_INIT,
     BATT_OK,
-    BATT_CANNOT_USE,
     BATT_CRITICAL
   };
 
     void init();
     
     void update2();
-
-    bool isUsingBattery();
 
     bool isBatteryCritical();
 

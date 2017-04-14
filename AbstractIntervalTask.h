@@ -5,7 +5,7 @@
 
 class AbstractIntervalTask : public AbstractTask {
 public:
-  AbstractIntervalTask(uint16_t intervalMs) {
+  AbstractIntervalTask(unsigned long intervalMs) {
     this->intervalMs = intervalMs;
   }
 
@@ -18,14 +18,14 @@ public:
   };
 
 protected:
-  void setInterval(uint16_t intervalMs) {
+  void setInterval(unsigned long intervalMs) {
     this->intervalMs = intervalMs;
   }
 
   virtual void update2() = 0;
 
 private:
-  uint16_t intervalMs = 1000;
+  unsigned long intervalMs = 1000;
   unsigned long lastUpdate;
 };
 

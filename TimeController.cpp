@@ -8,11 +8,10 @@ TimeController::~TimeController() {
 }
 
 void TimeController::init() {
-  //DCF.Start();
+  DCF.Start();
 }
 
 void TimeController::update2() {
-  /*
   time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
   if (DCFtime!=0)
   {
@@ -20,7 +19,7 @@ void TimeController::update2() {
     setTime(DCFtime);
     setInterval(60000);
     timeSynced = true;
-  }*/
+  }
 }
 
 bool TimeController::isTimeSynced() {

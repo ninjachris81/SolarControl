@@ -1,6 +1,6 @@
 #include "PumpController.h"
 
-PumpController::PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController) : AbstractIntervalTask(PUMP_STANDBY_INTERVAL_BATTERY_MS) {
+PumpController::PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController) : AbstractIntervalTask(UPDATE_PUMP_INTERVAL_MS) {
   this->relaisController = relaisController;
   this->ledController = ledController;
   this->batteryController = batteryController;
@@ -12,44 +12,30 @@ PumpController::~PumpController() {
 
 void PumpController::init() {
   setState(false);
-  isOverride = false;
-  Serial.print("OVERRIDE: ");
-  Serial.println(isOverride, DEC);
-
 }
 
 void PumpController::update2() {
-  //if (isOverride) return;
+  if (isOverride) return;
   
   if (brightnessController->isDark()) {
     Serial.println(F("It's dark"));
-    if (batteryController->isUsingBattery()) {
-      setInterval(PUMP_STANDBY_INTERVAL_BATTERY_MS);
-    } else {
-      setInterval(PUMP_STANDBY_INTERVAL_AC_MS);
-    }
 
-    if (pumpOn) {
-      pumpOn = false;
-      pumpTimeout = 0;
-    } else {
-      pumpTimeout++;
-      if (pumpTimeout>=PUMP_TIMEOUT) {
-        pumpOn = true;
-        pumpTimeout = 0;
-      }
+    if (lastToggle==0 || (pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_ON_MS))) {
+      Serial.println(F("Pump intv off"));
+      setState(false);
+      lastToggle = millis();      
+    } else if (lastToggle==0 || (!pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_OFF_MS))) {
+      Serial.println(F("Pump intv on"));
+      setState(true);
+      lastToggle = millis();      
     }
-  
-    setState(pumpOn);  
   } else {
     setState(true);
+    lastToggle = 0;
   }
 }
 bool PumpController::hasOverride() {
-  Serial.print("OVERRIDE: ");
-  Serial.println(isOverride, DEC);
-  //return isOverride;
-  return false;
+  return isOverride;
 }
 
 void PumpController::overrideState(bool isOverride, bool pumpOn) {

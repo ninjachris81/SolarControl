@@ -17,7 +17,7 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
 #endif
 
-#define BRIGHTNESS_DARK_LEVEL 500
+#define BRIGHTNESS_DARK_LEVEL 200
 
 class BrightnessController : public AbstractIntervalTask {
 public:
