@@ -26,7 +26,7 @@
   #define ADJUST_COUNTDOWN 60
 #endif
 
-#define BRIGHTNESS_GLOBAL_THRESHOLD 100
+#define BRIGHTNESS_GLOBAL_THRESHOLD 200
 
 class PanelAngleController : public AbstractIntervalTask {
 public:

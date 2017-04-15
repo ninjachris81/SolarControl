@@ -27,7 +27,7 @@ void PumpController::update2() {
     } else if (lastToggle==0 || (!pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_OFF_MS))) {
       Serial.println(F("Pump intv on"));
       setState(true);
-      lastToggle = millis();      
+      lastToggle = millis();
     }
   } else {
     setState(true);
@@ -44,6 +44,11 @@ void PumpController::overrideState(bool isOverride, bool pumpOn) {
 }
 
 void PumpController::setState(bool pumpOn) {
+  if (batteryController->isBatteryCritical()) {
+    Serial.println(F("Batt critical - ignoring pump"));
+    return;
+  }
+  
   if (this->pumpOn==pumpOn) return;
   
   Serial.print(F("Setting pump state to "));
