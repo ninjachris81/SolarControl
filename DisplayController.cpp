@@ -9,6 +9,7 @@ DisplayController::DisplayController(ButtonController* buttonController, Brightn
   this->batteryController = batteryController;
   this->panelAngleController = panelAngleController;
   this->pumpController = pumpController;
+  this->timeController = timeController;
   
   this->buttonController->setJoystickHandler(this);
 }
@@ -34,8 +35,9 @@ void DisplayController::updateDisplay() {
   ledControl.clearDisplay(DEFAULT_DISPLAY_ADDR);
 
   switch(displayContent) {
-    case DC_TIME:
-      if (!timeController->isTimeSynced()) {
+    case DC_TIME: {
+      TimeController::TIME_STATE ts = timeController->getState();
+      if (ts==TimeController::TIME_INIT) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 5, 'n', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'o', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, '5', false);
@@ -48,8 +50,17 @@ void DisplayController::updateDisplay() {
         
         if (minute()<10) printNumber(DEFAULT_DISPLAY_ADDR, 0, 1);
         printNumber(DEFAULT_DISPLAY_ADDR, minute(), 0);
+
+        if (ts==TimeController::TIME_DCF77) {
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'C', false);
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'F', false);
+        } else if (ts==TimeController::TIME_DS1307){
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'D', false);
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, '5', false);
+        }
       }
       break;
+    }
     case DC_BRIGHTNESS:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x05);

@@ -32,14 +32,6 @@ void LedController::update2() {
   }
 }
 
-void LedController::setState(uint8_t index, bool state) {
-  if (state) {
-    setState(index, LED_ON);
-  } else {
-    setState(index, LED_OFF);
-  }
-}
-
 void LedController::setState(uint8_t index, LED_STATE state) {
   if (ledStates[index] == state) return;
 

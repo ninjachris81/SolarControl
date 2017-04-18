@@ -1,6 +1,6 @@
 #include "PanelAngleController.h"
 
-PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController *timeController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
+PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController* timeController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
   this->brightnessController = brightnessController;
   this->relaisController = relaisController;
   this->ledController = ledController;
@@ -36,7 +36,7 @@ void PanelAngleController::checkNewState() {
 
   if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
 
-    if (timeController->isTimeSynced()) {
+    if (timeController->getState()!=TimeController::TIME_INIT) {
       uint8_t h = timeController->getHourOfDay();
   
       if (h>=8 && h<=10) {    // 8 to 10
@@ -149,7 +149,7 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
     }
   }
 
-  ledController->setState(INDEX_LED_MOTOR_STATE, doEnable);
+  ledController->setState(INDEX_LED_MOTOR_STATE, doEnable ? LedController::LED_ON : LedController::LED_OFF);
   
   if (doEnable) {
     relaisController->setState(PIN_RELAIS_MOTOR_ON, true);

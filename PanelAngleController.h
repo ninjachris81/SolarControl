@@ -38,7 +38,7 @@ public:
       AS_OVERRIDE
     };
 
-    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController *timeController);
+    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController* timeController);
     virtual ~PanelAngleController();
 
     void init();

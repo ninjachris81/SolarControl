@@ -29,8 +29,6 @@ public:
     LedController();
     virtual ~LedController();
     
-    void setState(uint8_t index, bool state);
-
     void setState(uint8_t index, LED_STATE state);
 
     void init();

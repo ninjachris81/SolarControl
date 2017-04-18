@@ -11,12 +11,19 @@
 #include "Pins.h"
 #include <TimeLib.h>
 #include <DCF77.h>
+#include <Wire.h>
+#include <DS1307RTC.h>
 
-#define DCF_PIN 2           // Connection pin to DCF 77 device
 #define DCF_INTERRUPT 0    // Interrupt number associated with pin
 
 class TimeController : public AbstractIntervalTask {
 public:
+  enum TIME_STATE {
+    TIME_INIT,
+    TIME_DS1307,
+    TIME_DCF77
+  };
+
     TimeController();
     virtual ~TimeController();
 
@@ -24,13 +31,17 @@ public:
     
     void update2();
 
-    bool isTimeSynced();
+    TIME_STATE getState();
 
     uint8_t getHourOfDay();
 
 private:
   bool timeSynced = false;
-  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
+  TIME_STATE timeState = TIME_INIT;
+  
+  DCF77 DCF = DCF77(PIN_DCF77,DCF_INTERRUPT);
+
+  void submitTime(time_t thisTime, bool fromDCF77);
 };
 
 #endif /* TIMECONTROLLER_H */

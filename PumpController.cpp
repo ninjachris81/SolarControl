@@ -44,7 +44,7 @@ void PumpController::overrideState(bool isOverride, bool pumpOn) {
 }
 
 void PumpController::setState(bool pumpOn) {
-  if (batteryController->isBatteryCritical()) {
+  if (!isOverride && batteryController->isBatteryCritical()) {
     Serial.println(F("Batt critical - ignoring pump"));
     return;
   }
@@ -55,7 +55,7 @@ void PumpController::setState(bool pumpOn) {
   Serial.println(pumpOn);
   
   this->pumpOn = pumpOn;
-  ledController->setState(INDEX_LED_PUMP_STATE, pumpOn);
+  ledController->setState(INDEX_LED_PUMP_STATE, pumpOn ? LedController::LED_ON : LedController::LED_OFF);
   relaisController->setState(PIN_RELAIS_PUMP, pumpOn);
 }
 

@@ -1,6 +1,8 @@
 #include <LedControl.h>
 #include <TimeLib.h>
 #include <DCF77.h>
+#include <Wire.h>
+#include <DS1307RTC.h>
 
 #include "TaskManager.h"
 #include "TimeController.h"
@@ -43,5 +45,5 @@ void setup() {
 
 void loop() {
   taskManager.update();
-  delay(10);
+  delay(100);
 }
