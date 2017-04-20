@@ -14,8 +14,6 @@
 #include <Wire.h>
 #include <DS1307RTC.h>
 
-#define DCF_INTERRUPT 0    // Interrupt number associated with pin
-
 class TimeController : public AbstractIntervalTask {
 public:
   enum TIME_STATE {
@@ -39,7 +37,7 @@ private:
   bool timeSynced = false;
   TIME_STATE timeState = TIME_INIT;
   
-  DCF77 DCF = DCF77(PIN_DCF77,DCF_INTERRUPT);
+  DCF77 DCF = DCF77(PIN_DCF77,digitalPinToInterrupt(PIN_DCF77));
 
   void submitTime(time_t thisTime, bool fromDCF77);
 };
