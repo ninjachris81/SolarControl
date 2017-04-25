@@ -11,7 +11,7 @@ void TimeController::init() {
   DCF.Start();
 }
 
-void TimeController::update2() {
+void TimeController::update() {
   time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
   if (DCFtime!=0)
   {

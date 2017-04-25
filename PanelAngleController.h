@@ -7,7 +7,8 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractIntervalTask.h"
+#include <AbstractIntervalTask.h>
+
 #include "BrightnessController.h"
 #include "RelaisController.h"
 #include "LedController.h"
@@ -43,7 +44,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     void setState(ANGLE_STATE state);
 

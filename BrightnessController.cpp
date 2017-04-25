@@ -9,7 +9,7 @@ BrightnessController::~BrightnessController() {
 void BrightnessController::init() {
 }
 
-void BrightnessController::update2() {
+void BrightnessController::update() {
   sensorValue = analogRead(PIN_BRIGHTNESS_SENSOR);
 }
 

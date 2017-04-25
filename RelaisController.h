@@ -7,7 +7,8 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractTask.h"
+#include <AbstractTask.h>
+
 #include "Pins.h"
 
 class RelaisController : public AbstractTask {

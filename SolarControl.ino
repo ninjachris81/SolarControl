@@ -3,8 +3,8 @@
 #include <DCF77.h>
 #include <Wire.h>
 #include <DS1307RTC.h>
+#include <TaskManager.h>
 
-#include "TaskManager.h"
 #include "TimeController.h"
 #include "LedController.h"
 #include "BrightnessController.h"

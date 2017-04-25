@@ -22,6 +22,9 @@ void JoystickHandler::update() {
   short y = analogRead(pinY);
   uint8_t btn = digitalRead(pinBtn);
 
+  //Serial.println(x, DEC);
+  //Serial.println(y, DEC);
+
   if (btn==HIGH) {
     if (!BIT_CHECK(state,STATE_BUTTON)) {
       BIT_SET(state, STATE_BUTTON);

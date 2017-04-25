@@ -14,7 +14,7 @@ void PumpController::init() {
   setState(false);
 }
 
-void PumpController::update2() {
+void PumpController::update() {
   if (isOverride) return;
   
   if (brightnessController->isDark()) {

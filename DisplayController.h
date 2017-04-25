@@ -8,7 +8,8 @@
 #endif
 
 #include <LedControl.h>
-#include "AbstractIntervalTask.h"
+#include <AbstractIntervalTask.h>
+
 #include "ButtonController.h"
 #include "BrightnessController.h"
 #include "BatteryController.h"
@@ -19,7 +20,7 @@
 #include "Debug.h"
 #include "Pins.h"
 
-#define DISPLAY_BRIGHTNESS 4
+#define DISPLAY_BRIGHTNESS 8
 
 #ifdef IS_DEBUG
   #define DISPLAY_TIMEOUT_MS 20
@@ -47,7 +48,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     void onLeft(bool isDown);
     void onRight(bool isDown);

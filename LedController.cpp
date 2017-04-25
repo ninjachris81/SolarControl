@@ -23,7 +23,7 @@ void LedController::init() {
   setState(INDEX_LED_PUMP_STATE, LED_OFF);
 }
 
-void LedController::update2() {
+void LedController::update() {
   for (uint8_t i = 0; i < LED_COUNT; i++) {
     if (ledStates[i] == LED_BLINK) {
       int pin = getPin(i);

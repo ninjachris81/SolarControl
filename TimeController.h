@@ -7,7 +7,8 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractIntervalTask.h"
+#include <AbstractIntervalTask.h>
+
 #include "Pins.h"
 #include <TimeLib.h>
 #include <DCF77.h>
@@ -27,7 +28,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     TIME_STATE getState();
 

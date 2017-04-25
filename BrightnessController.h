@@ -7,8 +7,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AbstractIntervalTask.h>
+
 #include "Pins.h"
-#include "AbstractIntervalTask.h"
 #include "Debug.h"
 
 #ifdef IS_DEBUG
@@ -26,7 +27,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     int getSensorValue();
 

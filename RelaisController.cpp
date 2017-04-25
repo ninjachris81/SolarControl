@@ -18,13 +18,17 @@ void RelaisController::init() {
   digitalWrite(PIN_RELAIS_MOTOR_DOWN, HIGH);
   digitalWrite(PIN_RELAIS_PUMP, HIGH);
 
-  //setState(PIN_RELAIS_MOTOR_DOWN, true);
+  // for testing - remove me
+  digitalWrite(PIN_RELAIS_MOTOR_UP, LOW);
+  digitalWrite(PIN_RELAIS_MOTOR_DOWN, LOW);
+  digitalWrite(PIN_RELAIS_PUMP, LOW);
 }
 
 void RelaisController::update() {
 }
 
 void RelaisController::setState(uint8_t pin, bool state) {
+  return;
   Serial.print(F("Setting pin "));
   Serial.print(pin);
   Serial.print(F(" to "));

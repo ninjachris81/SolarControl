@@ -14,7 +14,7 @@ void PanelAngleController::init() {
   resetLastStates();
 }
 
-void PanelAngleController::update2() {
+void PanelAngleController::update() {
   if (isMotorOverride) return;
   
   if (isAdjustingAngle) {
@@ -152,8 +152,8 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
   ledController->setState(INDEX_LED_MOTOR_STATE, doEnable ? LedController::LED_ON : LedController::LED_OFF);
   
   if (doEnable) {
-    relaisController->setState(PIN_RELAIS_MOTOR_ON, true);
-    delay(500);
+    //relaisController->setState(PIN_RELAIS_MOTOR_ON, true);
+    //delay(500);
     if (directionUp) {
       relaisController->setState(PIN_RELAIS_MOTOR_DOWN, false);
       delay(500);
@@ -164,8 +164,8 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
       relaisController->setState(PIN_RELAIS_MOTOR_DOWN, true);
     }
   } else {
-    relaisController->setState(PIN_RELAIS_MOTOR_ON, false);
-    delay(500);
+    //relaisController->setState(PIN_RELAIS_MOTOR_ON, false);
+    //delay(500);
     relaisController->setState(PIN_RELAIS_MOTOR_DOWN, false);
     relaisController->setState(PIN_RELAIS_MOTOR_UP, false);
   }

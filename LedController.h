@@ -7,7 +7,7 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractIntervalTask.h"
+#include <AbstractIntervalTask.h>
 #include "Pins.h"
 #include "Debug.h"
 
@@ -33,7 +33,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     
 private:

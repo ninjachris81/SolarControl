@@ -7,7 +7,8 @@
 #include "WProgram.h"
 #endif
 
-#include "AbstractIntervalTask.h"
+#include <AbstractIntervalTask.h>
+
 #include "LedController.h"
 #include "RelaisController.h"
 #include "Pins.h"
@@ -16,11 +17,16 @@
 #ifdef IS_DEBUG
   #define UPDATE_BATTERY_INTERVAL_MS 1000
 #else
-  #define UPDATE_BATTERY_INTERVAL_MS 3000
+  #define UPDATE_BATTERY_INTERVAL_MS 500
 #endif
 
-#define R1 30000.0
-#define R2 7500.0
+#define CURRENT_VOLTAGES_BUFFER_SIZE 10
+
+//#define R1 30000.0
+//#define R2 7500.0
+
+#define R1 29700.0
+#define R2 7430.0
 
 #define CRITICAL_BATTERY_VOLTAGE 11.0
 
@@ -37,7 +43,7 @@ public:
 
     void init();
     
-    void update2();
+    void update();
 
     bool isBatteryCritical();
 
@@ -45,7 +51,8 @@ public:
 
 private:
   BATT_STATE battState = BATT_INIT;
-  float currentVoltage = 0;
+  float currentVoltages[CURRENT_VOLTAGES_BUFFER_SIZE];
+  uint8_t currentVoltagesIndex = 0;
 
   LedController* ledController;
   RelaisController* relaisController;

@@ -23,7 +23,7 @@ void DisplayController::init() {
   ledControl.clearDisplay(DEFAULT_DISPLAY_ADDR);
 }
 
-void DisplayController::update2() {
+void DisplayController::update() {
   if (displayTimeout>0) displayTimeout--;
   setDisplayOn(displayTimeout>0);
   updateDisplay();
@@ -194,11 +194,11 @@ void DisplayController::setDisplayOn(bool newDisplayOn) {
 }
 
 void DisplayController::onLeft(bool isDown) {
-  onLeftRight(isDown, -1);
+  //onLeftRight(isDown, -1);
 }
 
 void DisplayController::onRight(bool isDown) {
-  onLeftRight(isDown, 1);
+  //onLeftRight(isDown, 1);
 }
 
 void DisplayController::onLeftRight(bool isDown, int dir){
@@ -239,14 +239,14 @@ void DisplayController::onUpDown(bool isDown, int dir) {
 }
 
 void DisplayController::onUp(bool isDown) {
-  onUpDown(isDown, -1);
+  //onUpDown(isDown, -1);
 }
 
 void DisplayController::onDown(bool isDown) {
-  onUpDown(isDown, 1);
+  //onUpDown(isDown, 1);
 }
 
 void DisplayController::onPressed(bool isDown) {
-  
+  onLeftRight(isDown, 1);
 }
 
