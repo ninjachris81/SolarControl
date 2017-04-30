@@ -15,19 +15,23 @@
 #include "TimeController.h"
 #include "Debug.h"
 
-#define UPDATE_PA_INTERVAL_MS 1000
+#define UPDATE_PA_INTERVAL_MS 2000
 
 #ifdef IS_DEBUG
   #define LAST_STATES_MIN_COUNT 10
   #define LAST_STATES_LIMIT 15
   #define ADJUST_COUNTDOWN 6
+  #define ADJUST_UP_ADD_COUNTDOWN 2
+  #define INIT_SETUP_TIMEOUT 10
 #else
-  #define LAST_STATES_MIN_COUNT 180   // -> every 3 minutes
+  #define LAST_STATES_MIN_COUNT 180   // -> every 6 minutes
   #define LAST_STATES_LIMIT 220
-  #define ADJUST_COUNTDOWN 60
+  #define ADJUST_COUNTDOWN 80
+  #define ADJUST_UP_ADD_COUNTDOWN 30
+  #define INIT_SETUP_TIMEOUT 90 // 3 min down
 #endif
 
-#define BRIGHTNESS_GLOBAL_THRESHOLD 200
+#define BRIGHTNESS_GLOBAL_THRESHOLD 100
 
 class PanelAngleController : public AbstractIntervalTask {
 public:
@@ -54,6 +58,8 @@ public:
 
     int getMotorState();
 
+    uint8_t getAdjustTimeoutProgress();
+
     void overrideMotorState(bool doEnable, bool directionUp);
 
 private:
@@ -70,8 +76,9 @@ private:
   uint8_t lastStates[4];
   uint8_t lastStatesCount = 0;
   
-  bool isAdjustingAngle = false;
-  uint8_t adjustCountdown = 0;
+  bool isAdjustingAngle = true;
+  uint8_t adjustCountdown = INIT_SETUP_TIMEOUT;
+  uint8_t orgAdjustCountdown = INIT_SETUP_TIMEOUT;
   
   BrightnessController* brightnessController;
   RelaisController* relaisController;

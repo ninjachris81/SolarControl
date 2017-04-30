@@ -13,6 +13,7 @@
 #include "LedController.h"
 #include "BatteryController.h"
 #include "BrightnessController.h"
+#include "TimeController.h"
 #include "Pins.h"
 #include "Debug.h"
 
@@ -30,7 +31,7 @@
 
 class PumpController : public AbstractIntervalTask {
 public:
-    PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController);
+    PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController, TimeController* timeController);
     virtual ~PumpController();
 
     void init();
@@ -55,6 +56,7 @@ private:
   LedController* ledController;
   BatteryController* batteryController;
   BrightnessController* brightnessController;
+  TimeController* timeController;
 
 };
 

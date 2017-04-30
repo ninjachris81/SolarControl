@@ -69,6 +69,8 @@ private:
   void printNumber(int addr, float v, uint8_t offset);
   void printBool(int addr, bool v, uint8_t offset);
 
+  uint8_t tempTestRemoveMe = 0;
+
   bool displayOn = true;
   int displayContent = DC_TIME;
   uint16_t displayTimeout = DISPLAY_TIMEOUT_MS;

@@ -1,4 +1,5 @@
 #include "BrightnessController.h"
+#include <LogHelper.h>
 
 BrightnessController::BrightnessController() : AbstractIntervalTask(UPDATE_BRIGHTNESS_INTERVAL_MS) {
 }
@@ -10,14 +11,13 @@ void BrightnessController::init() {
 }
 
 void BrightnessController::update() {
-  sensorValue = analogRead(PIN_BRIGHTNESS_SENSOR);
+  sensorValue.pushValue(analogRead(PIN_BRIGHTNESS_SENSOR));
 }
 
 int BrightnessController::getSensorValue() {
-  return sensorValue;
+  return sensorValue.getValue();
 }
 
 bool BrightnessController::isDark() {
-  return sensorValue>BRIGHTNESS_DARK_LEVEL;
+  return getSensorValue()>BRIGHTNESS_DARK_LEVEL;
 }
-

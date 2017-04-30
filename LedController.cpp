@@ -1,4 +1,5 @@
 #include "LedController.h"
+#include <LogHelper.h>
 
 LedController::LedController() : AbstractIntervalTask(BLINK_INTERVAL_MS) {
   for (uint8_t i = 0; i < LED_COUNT; i++) ledStates[i] = LED_OFF;

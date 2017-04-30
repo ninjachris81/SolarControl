@@ -1,10 +1,12 @@
 #include "PumpController.h"
+#include <LogHelper.h>
 
-PumpController::PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController) : AbstractIntervalTask(UPDATE_PUMP_INTERVAL_MS) {
+PumpController::PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController, TimeController* timeController) : AbstractIntervalTask(UPDATE_PUMP_INTERVAL_MS) {
   this->relaisController = relaisController;
   this->ledController = ledController;
   this->batteryController = batteryController;
   this->brightnessController = brightnessController;
+  this->timeController = timeController;
 }
 
 PumpController::~PumpController() {
@@ -16,16 +18,23 @@ void PumpController::init() {
 
 void PumpController::update() {
   if (isOverride) return;
+  bool doStandby = false;
   
-  if (brightnessController->isDark()) {
-    Serial.println(F("It's dark"));
+  if ((timeController->getHourOfDay()<=6 && timeController->getHourOfDay()>=0) || timeController->getHourOfDay()>=20) {
+    LOG_PRINT(F("It's night"));
+    doStandby = true;
+  } else if (brightnessController->isDark()) {
+    LOG_PRINT(F("It's dark"));
+    doStandby = true;
+  }
 
+  if (doStandby) {
     if (lastToggle==0 || (pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_ON_MS))) {
-      Serial.println(F("Pump intv off"));
+      LOG_PRINTLN(F("Pump intv off"));
       setState(false);
       lastToggle = millis();      
     } else if (lastToggle==0 || (!pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_OFF_MS))) {
-      Serial.println(F("Pump intv on"));
+      LOG_PRINTLN(F("Pump intv on"));
       setState(true);
       lastToggle = millis();
     }
@@ -45,14 +54,14 @@ void PumpController::overrideState(bool isOverride, bool pumpOn) {
 
 void PumpController::setState(bool pumpOn) {
   if (!isOverride && batteryController->isBatteryCritical()) {
-    Serial.println(F("Batt critical - ignoring pump"));
+    LOG_PRINTLN(F("Batt critical - ignoring pump"));
     return;
   }
   
   if (this->pumpOn==pumpOn) return;
   
-  Serial.print(F("Setting pump state to "));
-  Serial.println(pumpOn);
+  LOG_PRINT(F("Setting pump state to "));
+  LOG_PRINTLN(pumpOn);
   
   this->pumpOn = pumpOn;
   ledController->setState(INDEX_LED_PUMP_STATE, pumpOn ? LedController::LED_ON : LedController::LED_OFF);

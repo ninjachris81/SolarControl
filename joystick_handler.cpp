@@ -90,7 +90,5 @@ void JoystickHandler::update() {
     }
   }
   
-//  Serial.println(state, BIN);
-  
 }
 

@@ -1,4 +1,5 @@
 #include "ButtonController.h"
+#include <LogHelper.h>
 
 ButtonController::ButtonController() {
 }

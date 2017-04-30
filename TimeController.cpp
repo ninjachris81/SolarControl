@@ -1,7 +1,8 @@
 #include "TimeController.h"
 #include "Debug.h"
+#include <LogHelper.h>
 
-TimeController::TimeController() : AbstractIntervalTask(1000) {
+TimeController::TimeController() : AbstractIntervalTask(INIT_INTERVAL_MS) {
 }
 
 TimeController::~TimeController() {
@@ -15,17 +16,17 @@ void TimeController::update() {
   time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
   if (DCFtime!=0)
   {
-    Serial.println(F("DCF77 Time set"));
+    LOG_PRINTLN(F("DCF77 Time set"));
     submitTime(DCFtime, true);
   } else {
     tmElements_t tm;
   
     if (RTC.read(tm)) {
-      Serial.print("RTC Time set");
+      LOG_PRINTLN("RTC Time set");
       submitTime(makeTime(tm), false);
     } else {
       if (RTC.chipPresent()) {
-        Serial.println(F("The DS1307 stopped - setting default time"));
+        LOG_PRINTLN(F("The DS1307 stopped - setting default time"));
         tm.Hour = 14;
         tm.Minute = 0;
         tm.Second = 0;
@@ -35,19 +36,19 @@ void TimeController::update() {
         if (RTC.write(tm)) {
           submitTime(makeTime(tm), false);
         } else {
-          Serial.println(F("DS1307 write error!"));
+          LOG_PRINTLN(F("DS1307 write error!"));
         }
       } else {
-        Serial.println(F("DS1307 read error!"));
+        LOG_PRINTLN(F("DS1307 read error!"));
       }
     }
   }
 }
 
 void TimeController::submitTime(time_t thisTime, bool fromDCF77) {
-  Serial.print(F("Submit time "));
-  Serial.print(fromDCF77 ? F("DCF ") : F("DS1307 "));
-  Serial.println(thisTime);
+  LOG_PRINT(F("Submit time "));
+  LOG_PRINT(fromDCF77 ? F("DCF ") : F("DS1307 "));
+  LOG_PRINTLN(thisTime);
   
   setTime(thisTime);
   if (fromDCF77) {
@@ -57,10 +58,10 @@ void TimeController::submitTime(time_t thisTime, bool fromDCF77) {
     tmElements_t tm;
     breakTime(thisTime, tm);
     RTC.write(tm);
-    setInterval(60000);
+    setInterval(DCF_INTERVAL_MS);
   } else {
-    timeState = TIME_DS1307;
-    setInterval(1000);
+    if (timeState==TIME_INIT) timeState = TIME_DS1307;
+    setInterval(DS_INTERVAL_MS);      // relax a bit - we have a time
   }
 }
 

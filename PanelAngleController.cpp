@@ -1,4 +1,5 @@
 #include "PanelAngleController.h"
+#include <LogHelper.h>
 
 PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController* timeController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
   this->brightnessController = brightnessController;
@@ -12,6 +13,7 @@ PanelAngleController::~PanelAngleController() {
 
 void PanelAngleController::init() {
   resetLastStates();
+  setMotorState(true, false);
 }
 
 void PanelAngleController::update() {
@@ -30,8 +32,8 @@ void PanelAngleController::checkNewState() {
   int brightness = brightnessController->getSensorValue();
 
 #ifdef IS_DEBUG
-  Serial.print(F("Brightness: "));
-  Serial.print(brightness, DEC);
+  LOG_PRINT(F("Brightness: "));
+  LOG_PRINTLNF(brightness, DEC);
 #endif
 
   if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
@@ -39,9 +41,9 @@ void PanelAngleController::checkNewState() {
     if (timeController->getState()!=TimeController::TIME_INIT) {
       uint8_t h = timeController->getHourOfDay();
   
-      if (h>=8 && h<=10) {    // 8 to 10
+      if (h>=7 && h<=10) {    // 7 to 10
         newState = AS_EAST;
-      } else if (h>=11 && h<=14) {   // 11 to 14
+      } else if (h>=11 && h<=13) {   // 11 to 14
         newState = AS_MIDDLE;
       } else {
         newState = AS_DEFAULT;
@@ -57,8 +59,8 @@ void PanelAngleController::checkNewState() {
   lastStatesCount++;
 
 #ifdef IS_DEBUG
-  Serial.print(F(", Angle: "));
-  Serial.println(newState, DEC);
+  LOG_PRINT(F(", Angle: "));
+  LOG_PRINTLNF(newState, DEC);
 #endif
 
   if (lastStatesCount>=LAST_STATES_LIMIT) {
@@ -73,8 +75,8 @@ void PanelAngleController::checkState() {
   adjustCountdown--;
   
 #ifdef IS_DEBUG
-  Serial.print(F("Adjusting "));
-  Serial.println(adjustCountdown, DEC);
+  LOG_PRINT(F("Adjusting "));
+  LOG_PRINTLNF(adjustCountdown, DEC);
 #endif
 
   if (adjustCountdown<=0) {
@@ -93,12 +95,17 @@ void PanelAngleController::resetLastStates() {
 void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {
   if (state==currentState) return;
 
-  Serial.print(F("New angle: "));
-  Serial.println(state, DEC);
+  LOG_PRINT(F("New angle: "));
+  LOG_PRINTF(state, DEC);
 
   isAdjustingAngle = true;
   int directionFactor = state - currentState;
   adjustCountdown = ADJUST_COUNTDOWN * abs(directionFactor);
+  if (state==AS_MAX) {
+    adjustCountdown+=ADJUST_UP_ADD_COUNTDOWN;
+  }
+
+  orgAdjustCountdown = adjustCountdown;
 
   if (directionFactor>0) {
     setMotorState(true, true);
@@ -113,6 +120,10 @@ int PanelAngleController::getMotorState() {
   return currentMotorState;
 }
 
+uint8_t PanelAngleController::getAdjustTimeoutProgress() {
+  float factor =  orgAdjustCountdown / adjustCountdown;
+  return 100 / factor;
+}
 
 void PanelAngleController::setMotorState(bool doEnable) {
   setMotorState(doEnable, false);
@@ -131,14 +142,12 @@ void PanelAngleController::overrideMotorState(bool doEnable, bool directionUp) {
   setMotorState(doEnable, directionUp);
 }
 
-
 void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
-#ifdef IS_DEBUG
-  Serial.print(F("Setting motor state: "));
-  Serial.print(doEnable);
-  Serial.print(F(", direction: "));
-  Serial.println(directionUp, DEC);
-#endif
+  LOG_PRINT(F("Setting motor state: "));
+  LOG_PRINT(doEnable);
+  LOG_PRINT(F(", direction: "));
+  LOG_PRINTLNF(directionUp, DEC);
+
   if (!doEnable) {
     currentMotorState = 0;
   } else {

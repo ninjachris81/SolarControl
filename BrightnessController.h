@@ -8,6 +8,7 @@
 #endif
 
 #include <AbstractIntervalTask.h>
+#include <SmoothValue.h>
 
 #include "Pins.h"
 #include "Debug.h"
@@ -18,7 +19,7 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
 #endif
 
-#define BRIGHTNESS_DARK_LEVEL 200
+#define BRIGHTNESS_DARK_LEVEL 50
 
 class BrightnessController : public AbstractIntervalTask {
 public:
@@ -32,9 +33,9 @@ public:
     int getSensorValue();
 
     bool isDark();
-    
+
 private:
-  int sensorValue = 0;
+  SmoothValue sensorValue;
 
 };
 

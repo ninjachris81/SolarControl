@@ -8,6 +8,7 @@
 #endif
 
 #include <AbstractIntervalTask.h>
+#include <SmoothValue.h>
 
 #include "LedController.h"
 #include "RelaisController.h"
@@ -20,7 +21,7 @@
   #define UPDATE_BATTERY_INTERVAL_MS 500
 #endif
 
-#define CURRENT_VOLTAGES_BUFFER_SIZE 10
+#define VOLTAGE_CORRECTION 2.0
 
 //#define R1 30000.0
 //#define R2 7500.0
@@ -50,9 +51,8 @@ public:
     float getVoltage();
 
 private:
+  SmoothValue currentVoltage;
   BATT_STATE battState = BATT_INIT;
-  float currentVoltages[CURRENT_VOLTAGES_BUFFER_SIZE];
-  uint8_t currentVoltagesIndex = 0;
 
   LedController* ledController;
   RelaisController* relaisController;

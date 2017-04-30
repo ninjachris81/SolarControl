@@ -5,6 +5,7 @@
 #include <DS1307RTC.h>
 #include <TaskManager.h>
 
+#include <LogHelper.h>
 #include "TimeController.h"
 #include "LedController.h"
 #include "BrightnessController.h"
@@ -24,11 +25,13 @@ LedController ledController;
 RelaisController relaisController;
 PanelAngleController panelAngleController(&brightnessController, &relaisController, &ledController, &timeController);
 BatteryController batteryController(&ledController, &relaisController);
-PumpController pumpController(&relaisController, &ledController, &batteryController, &brightnessController);
+PumpController pumpController(&relaisController, &ledController, &batteryController, &brightnessController, &timeController);
 DisplayController displayController(&buttonController, &brightnessController, &batteryController, &panelAngleController, &pumpController, &timeController);
 
 void setup() {
-  Serial.begin(115200);
+  LOG_INIT();
+
+  LOG_PRINT(F("SETUP"));
 
   taskManager.registerTask(&timeController);
   taskManager.registerTask(&buttonController);

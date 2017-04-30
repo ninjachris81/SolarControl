@@ -1,5 +1,6 @@
 #include "DisplayController.h"
 #include "Debug.h"
+#include <LogHelper.h>
 #include <TimeLib.h>
 #include <math.h>
 
@@ -24,6 +25,12 @@ void DisplayController::init() {
 }
 
 void DisplayController::update() {
+  tempTestRemoveMe++;
+  if (tempTestRemoveMe>3) {
+    tempTestRemoveMe = 0;
+    onLeftRight(true,1);    
+  }
+  
   if (displayTimeout>0) displayTimeout--;
   setDisplayOn(displayTimeout>0);
   updateDisplay();
@@ -74,22 +81,35 @@ void DisplayController::updateDisplay() {
       printNumber(DEFAULT_DISPLAY_ADDR, batteryController->getVoltage(), 0);
 
       break;
-    case DC_PANEL_ANGLE:
+    case DC_PANEL_ANGLE: {
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', false);
+      bool printCountdown = true;
+      
       if (panelAngleController->getMotorState()<0) {
         ledControl.setRow(DEFAULT_DISPLAY_ADDR,4,0x3e);     //u
-        ledControl.setRow(DEFAULT_DISPLAY_ADDR,3,0x67);     //p
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
+        //ledControl.setRow(DEFAULT_DISPLAY_ADDR,3,0x67);     //p
       } else if (panelAngleController->getMotorState()>0) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'd', false);
-        ledControl.setRow(DEFAULT_DISPLAY_ADDR, 3, 0x1d);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
+        //ledControl.setRow(DEFAULT_DISPLAY_ADDR, 3, 0x1d);   // o
       } else {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, ' ', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 2, ' ', false);
+        printCountdown = false;
+      }
+
+      if (printCountdown) {
+        int v = panelAngleController->getAdjustTimeoutProgress();
+        if (v>99) v = 99;
+        ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 2, v, false);
       }
 
       ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 0, panelAngleController->getState(), false);
       break;
+    }
     case DC_PUMP:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);
@@ -187,8 +207,8 @@ void DisplayController::setDisplayOn(bool newDisplayOn) {
   if (displayOn==newDisplayOn) return;
   displayOn = newDisplayOn;
   
-  Serial.print(F("Displ "));
-  Serial.println(newDisplayOn);
+  LOG_PRINT(F("Displ "));
+  LOG_PRINTLN(newDisplayOn);
   
   ledControl.shutdown(DEFAULT_DISPLAY_ADDR, !displayOn);
 }
@@ -247,6 +267,6 @@ void DisplayController::onDown(bool isDown) {
 }
 
 void DisplayController::onPressed(bool isDown) {
-  onLeftRight(isDown, 1);
+  //onLeftRight(isDown, 1);
 }
 
