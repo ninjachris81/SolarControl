@@ -41,9 +41,9 @@ void PanelAngleController::checkNewState() {
     if (timeController->getState()!=TimeController::TIME_INIT) {
       uint8_t h = timeController->getHourOfDay();
   
-      if (h>=7 && h<=10) {    // 7 to 10
+      if (h>=7 && h<=9) {    // 7 to 9
         newState = AS_EAST;
-      } else if (h>=11 && h<=13) {   // 11 to 14
+      } else if (h>=10 && h<=13) {   // 10 to 13
         newState = AS_MIDDLE;
       } else {
         newState = AS_DEFAULT;
@@ -100,11 +100,19 @@ void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {
 
   isAdjustingAngle = true;
   int directionFactor = state - currentState;
-  adjustCountdown = ADJUST_COUNTDOWN * abs(directionFactor);
-  if (state==AS_MAX) {
-    adjustCountdown+=ADJUST_UP_ADD_COUNTDOWN;
+  float c = 0.0;
+
+  if (state==AS_EAST || currentState==AS_EAST) {
+    c = ADJUST_COUNTDOWN_BIG;
+  } else {
+    c = ADJUST_COUNTDOWN_SMALL;
   }
 
+  if (directionFactor>0) {    // up
+    c = c * UP_FACTOR;
+  }
+
+  adjustCountdown = c;
   orgAdjustCountdown = adjustCountdown;
 
   if (directionFactor>0) {
@@ -121,8 +129,7 @@ int PanelAngleController::getMotorState() {
 }
 
 uint8_t PanelAngleController::getAdjustTimeoutProgress() {
-  float factor =  orgAdjustCountdown / adjustCountdown;
-  return 100 / factor;
+  return 100.0 / ((float)orgAdjustCountdown / (float)adjustCountdown);
 }
 
 void PanelAngleController::setMotorState(bool doEnable) {

@@ -11,7 +11,7 @@
 #include <AbstractTask.h>
 
 #include "Pins.h"
-#include "joystick_handler.h"
+#include <FiveKeysHandler.h>
 
 class ButtonController : public AbstractTask {
 public:
@@ -22,10 +22,10 @@ public:
     
     void update();
 
-    void setJoystickHandler(JoystickHandler::JoystickFeedbackHandler *handler);
+    void setButtonHandler(FiveKeysHandler::FKFeedbackHandler *handler);
 
 private:
-  JoystickHandler joystick = JoystickHandler(PIN_BUTTON_X, PIN_BUTTON_Y, PIN_BUTTON_BTN);
+  FiveKeysHandler keysHandler = FiveKeysHandler(PIN_5BUTTONS);
 };
 
 #endif /* BUTTONCONTROLLER_H */

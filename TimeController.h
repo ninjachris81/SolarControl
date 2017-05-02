@@ -16,7 +16,6 @@
 #include <DS1307RTC.h>
 
 #define INIT_INTERVAL_MS 1000
-#define DS_INTERVAL_MS 10000
 #define DCF_INTERVAL_MS 60000
 
 class TimeController : public AbstractIntervalTask {
@@ -37,6 +36,8 @@ public:
     TIME_STATE getState();
 
     uint8_t getHourOfDay();
+
+    bool hasDCF77Signal();
 
 private:
   bool timeSynced = false;

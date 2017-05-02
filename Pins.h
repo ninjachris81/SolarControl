@@ -1,6 +1,6 @@
-#define PIN_BUTTON_X A0
-#define PIN_BUTTON_Y A1
-#define PIN_BUTTON_BTN A2
+#define PIN_5BUTTONS A0
+//#define PIN_BUTTON_Y A1
+//#define PIN_BUTTON_BTN A2
 
 #define PIN_BATTERY_VOLTAGE A3
 

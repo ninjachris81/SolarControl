@@ -11,9 +11,9 @@ void ButtonController::init() {
 }
 
 void ButtonController::update() {
-  joystick.update();
+  keysHandler.update();
 }
 
-void ButtonController::setJoystickHandler(JoystickHandler::JoystickFeedbackHandler *handler) {
-  joystick.setFeedbackHandler(handler);
+void ButtonController::setButtonHandler(FiveKeysHandler::FKFeedbackHandler *handler) {
+  keysHandler.init(handler);
 }

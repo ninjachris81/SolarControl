@@ -53,8 +53,13 @@ void PumpController::overrideState(bool isOverride, bool pumpOn) {
 }
 
 void PumpController::setState(bool pumpOn) {
-  if (!isOverride && batteryController->isBatteryCritical()) {
-    LOG_PRINTLN(F("Batt critical - ignoring pump"));
+  if (!isOverride) {
+    LOG_PRINTLN(F("OVERRIDE - ignoring pump"));
+    return;
+  }
+
+  if (pumpOn && batteryController->isBatteryCritical()) {
+    LOG_PRINTLN(F("Batt critical - ignoring pump on"));
     return;
   }
   
@@ -70,6 +75,10 @@ void PumpController::setState(bool pumpOn) {
 
 bool PumpController::getState() {
   return pumpOn;
+}
+
+int PumpController::getRemainingMinutes() {
+  return (millis() - lastToggle) / 60000;
 }
 
 

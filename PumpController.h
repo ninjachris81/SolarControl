@@ -46,6 +46,8 @@ public:
 
     bool hasOverride();
 
+    int getRemainingMinutes();
+
 private:
   bool isOverride = false;
 

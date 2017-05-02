@@ -5,6 +5,8 @@
 #include <DS1307RTC.h>
 #include <TaskManager.h>
 
+#define NO_LOG_SERIAL
+
 #include <LogHelper.h>
 #include "TimeController.h"
 #include "LedController.h"

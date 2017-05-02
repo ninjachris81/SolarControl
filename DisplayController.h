@@ -9,6 +9,7 @@
 
 #include <LedControl.h>
 #include <AbstractIntervalTask.h>
+#include <FiveKeysHandler.h>
 
 #include "ButtonController.h"
 #include "BrightnessController.h"
@@ -31,7 +32,7 @@
 #define DEFAULT_DISPLAY_ADDR 0
 
 
-class DisplayController : public AbstractIntervalTask, public JoystickHandler::JoystickFeedbackHandler {
+class DisplayController : public AbstractIntervalTask, public FiveKeysHandler::FKFeedbackHandler {
 public:
   enum DISPLAY_CONTENT {
     DC_TIME,
@@ -68,8 +69,6 @@ private:
   void printNumber(int addr, int v, uint8_t offset, bool withDot);
   void printNumber(int addr, float v, uint8_t offset);
   void printBool(int addr, bool v, uint8_t offset);
-
-  uint8_t tempTestRemoveMe = 0;
 
   bool displayOn = true;
   int displayContent = DC_TIME;

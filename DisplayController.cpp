@@ -12,7 +12,7 @@ DisplayController::DisplayController(ButtonController* buttonController, Brightn
   this->pumpController = pumpController;
   this->timeController = timeController;
   
-  this->buttonController->setJoystickHandler(this);
+  this->buttonController->setButtonHandler(this);
 }
 
 DisplayController::~DisplayController() {
@@ -25,12 +25,6 @@ void DisplayController::init() {
 }
 
 void DisplayController::update() {
-  tempTestRemoveMe++;
-  if (tempTestRemoveMe>3) {
-    tempTestRemoveMe = 0;
-    onLeftRight(true,1);    
-  }
-  
   if (displayTimeout>0) displayTimeout--;
   setDisplayOn(displayTimeout>0);
   updateDisplay();
@@ -58,12 +52,14 @@ void DisplayController::updateDisplay() {
         if (minute()<10) printNumber(DEFAULT_DISPLAY_ADDR, 0, 1);
         printNumber(DEFAULT_DISPLAY_ADDR, minute(), 0);
 
+        bool hasDCF77Signal = timeController->hasDCF77Signal();
+
         if (ts==TimeController::TIME_DCF77) {
           ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'C', false);
-          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'F', false);
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'F', hasDCF77Signal);
         } else if (ts==TimeController::TIME_DS1307){
           ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'D', false);
-          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, '5', false);
+          ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, '5', hasDCF77Signal);
         }
       }
       break;
@@ -104,7 +100,7 @@ void DisplayController::updateDisplay() {
       if (printCountdown) {
         int v = panelAngleController->getAdjustTimeoutProgress();
         if (v>99) v = 99;
-        ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 2, v, false);
+        printNumber(DEFAULT_DISPLAY_ADDR, 3, v);
       }
 
       ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 0, panelAngleController->getState(), false);
@@ -115,9 +111,9 @@ void DisplayController::updateDisplay() {
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);
 
       if (pumpController->hasOverride()) {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'o', false);
+        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, 'o', false);
       } else {
-        ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, ' ', false);
+        printNumber(DEFAULT_DISPLAY_ADDR, pumpController->getRemainingMinutes(), 3);
       }
       printBool(DEFAULT_DISPLAY_ADDR, pumpController->getState(), 0);
       break;
@@ -214,11 +210,11 @@ void DisplayController::setDisplayOn(bool newDisplayOn) {
 }
 
 void DisplayController::onLeft(bool isDown) {
-  //onLeftRight(isDown, -1);
+  onLeftRight(isDown, -1);
 }
 
 void DisplayController::onRight(bool isDown) {
-  //onLeftRight(isDown, 1);
+  onLeftRight(isDown, 1);
 }
 
 void DisplayController::onLeftRight(bool isDown, int dir){
@@ -259,14 +255,14 @@ void DisplayController::onUpDown(bool isDown, int dir) {
 }
 
 void DisplayController::onUp(bool isDown) {
-  //onUpDown(isDown, -1);
+  onUpDown(isDown, -1);
 }
 
 void DisplayController::onDown(bool isDown) {
-  //onUpDown(isDown, 1);
+  onUpDown(isDown, 1);
 }
 
 void DisplayController::onPressed(bool isDown) {
-  //onLeftRight(isDown, 1);
+  onLeftRight(isDown, 1);
 }
 

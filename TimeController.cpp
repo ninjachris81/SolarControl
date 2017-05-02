@@ -61,7 +61,6 @@ void TimeController::submitTime(time_t thisTime, bool fromDCF77) {
     setInterval(DCF_INTERVAL_MS);
   } else {
     if (timeState==TIME_INIT) timeState = TIME_DS1307;
-    setInterval(DS_INTERVAL_MS);      // relax a bit - we have a time
   }
 }
 
@@ -72,3 +71,8 @@ TimeController::TIME_STATE TimeController::getState() {
 uint8_t TimeController::getHourOfDay() {
   return hour();
 }
+
+bool TimeController::hasDCF77Signal() {
+  return DCF.hasSignal();
+}
+
