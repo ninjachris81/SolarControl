@@ -24,7 +24,7 @@
   #define PUMP_TIMEOUT 3
 #else
   #define UPDATE_PUMP_INTERVAL_MS 10000
-  #define PUMP_STANDBY_INTERVAL_ON_MS 60000   // 1 min
+  #define PUMP_STANDBY_INTERVAL_ON_MS 120000   // 2 min
   #define PUMP_STANDBY_INTERVAL_OFF_MS 1200000   // 20 min
   #define PUMP_TIMEOUT 6
 #endif

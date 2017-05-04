@@ -53,7 +53,7 @@ void PumpController::overrideState(bool isOverride, bool pumpOn) {
 }
 
 void PumpController::setState(bool pumpOn) {
-  if (!isOverride) {
+  if (isOverride) {
     LOG_PRINTLN(F("OVERRIDE - ignoring pump"));
     return;
   }
