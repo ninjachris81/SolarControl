@@ -44,7 +44,7 @@ public:
       AS_OVERRIDE
     };
 
-    PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController* timeController);
+    PanelAngleController();
     virtual ~PanelAngleController();
 
     void init();
@@ -80,11 +80,6 @@ private:
   bool isAdjustingAngle = true;
   uint8_t adjustCountdown = INIT_SETUP_TIMEOUT;
   uint8_t orgAdjustCountdown = INIT_SETUP_TIMEOUT;
-  
-  BrightnessController* brightnessController;
-  RelaisController* relaisController;
-  LedController* ledController;
-  TimeController *timeController;
 
 };
 

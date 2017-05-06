@@ -1,11 +1,9 @@
 #include "PanelAngleController.h"
 #include <LogHelper.h>
 
-PanelAngleController::PanelAngleController(BrightnessController* brightnessController, RelaisController* relaisController, LedController* ledController, TimeController* timeController) : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
-  this->brightnessController = brightnessController;
-  this->relaisController = relaisController;
-  this->ledController = ledController;
-  this->timeController = timeController;
+#include "TaskIDs.h"
+
+PanelAngleController::PanelAngleController() : AbstractIntervalTask(UPDATE_PA_INTERVAL_MS) {
 }
 
 PanelAngleController::~PanelAngleController() {
@@ -29,7 +27,7 @@ void PanelAngleController::update() {
 void PanelAngleController::checkNewState() {
   PanelAngleController::ANGLE_STATE newState = AS_DEFAULT;
   
-  int brightness = brightnessController->getSensorValue();
+  int brightness = taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getSensorValue();
 
 #ifdef IS_DEBUG
   LOG_PRINT(F("Brightness: "));
@@ -38,8 +36,8 @@ void PanelAngleController::checkNewState() {
 
   if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
 
-    if (timeController->getState()!=TimeController::TIME_INIT) {
-      uint8_t h = timeController->getHourOfDay();
+    if (taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->getState()!=TimeController::TIME_INIT) {
+      uint8_t h = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->getHourOfDay();
   
       if (h>=7 && h<=9) {    // 7 to 9
         newState = AS_EAST;
@@ -165,25 +163,25 @@ void PanelAngleController::setMotorState(bool doEnable, bool directionUp) {
     }
   }
 
-  ledController->setState(INDEX_LED_MOTOR_STATE, doEnable ? LedController::LED_ON : LedController::LED_OFF);
+  taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_MOTOR_STATE, doEnable ? LedController::LED_ON : LedController::LED_OFF);
   
   if (doEnable) {
-    //relaisController->setState(PIN_RELAIS_MOTOR_ON, true);
+    //taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_ON, true);
     //delay(500);
     if (directionUp) {
-      relaisController->setState(PIN_RELAIS_MOTOR_DOWN, false);
+      taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_DOWN, false);
       delay(500);
-      relaisController->setState(PIN_RELAIS_MOTOR_UP, true);
+      taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_UP, true);
     } else {
-      relaisController->setState(PIN_RELAIS_MOTOR_UP, false);
+      taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_UP, false);
       delay(500);
-      relaisController->setState(PIN_RELAIS_MOTOR_DOWN, true);
+      taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_DOWN, true);
     }
   } else {
     //relaisController->setState(PIN_RELAIS_MOTOR_ON, false);
     //delay(500);
-    relaisController->setState(PIN_RELAIS_MOTOR_DOWN, false);
-    relaisController->setState(PIN_RELAIS_MOTOR_UP, false);
+    taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_DOWN, false);
+    taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_MOTOR_UP, false);
   }
 }
 

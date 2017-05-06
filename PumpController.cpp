@@ -1,12 +1,14 @@
 #include "PumpController.h"
 #include <LogHelper.h>
+#include "RelaisController.h"
+#include "LedController.h"
+#include "BatteryController.h"
+#include "BrightnessController.h"
+#include "TimeController.h"
 
-PumpController::PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController, TimeController* timeController) : AbstractIntervalTask(UPDATE_PUMP_INTERVAL_MS) {
-  this->relaisController = relaisController;
-  this->ledController = ledController;
-  this->batteryController = batteryController;
-  this->brightnessController = brightnessController;
-  this->timeController = timeController;
+#include "TaskIDs.h"
+
+PumpController::PumpController() : AbstractIntervalTask(UPDATE_PUMP_INTERVAL_MS) {
 }
 
 PumpController::~PumpController() {
@@ -19,11 +21,13 @@ void PumpController::init() {
 void PumpController::update() {
   if (isOverride) return;
   bool doStandby = false;
+
+  TimeController* timeController = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER);
   
   if ((timeController->getHourOfDay()<=6 && timeController->getHourOfDay()>=0) || timeController->getHourOfDay()>=20) {
     LOG_PRINT(F("It's night"));
     doStandby = true;
-  } else if (brightnessController->isDark()) {
+  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark()) {
     LOG_PRINT(F("It's dark"));
     doStandby = true;
   }
@@ -58,7 +62,7 @@ void PumpController::setState(bool pumpOn) {
     return;
   }
 
-  if (pumpOn && batteryController->isBatteryCritical()) {
+  if (pumpOn && taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryCritical()) {
     LOG_PRINTLN(F("Batt critical - ignoring pump on"));
     return;
   }
@@ -69,8 +73,8 @@ void PumpController::setState(bool pumpOn) {
   LOG_PRINTLN(pumpOn);
   
   this->pumpOn = pumpOn;
-  ledController->setState(INDEX_LED_PUMP_STATE, pumpOn ? LedController::LED_ON : LedController::LED_OFF);
-  relaisController->setState(PIN_RELAIS_PUMP, pumpOn);
+  taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_PUMP_STATE, pumpOn ? LedController::LED_ON : LedController::LED_OFF);
+  taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_PUMP, pumpOn);
 }
 
 bool PumpController::getState() {

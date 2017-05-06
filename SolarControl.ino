@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <DS1307RTC.h>
 #include <TaskManager.h>
+#include <SoftwareSerial.h>
 
 #define NO_LOG_SERIAL
 
@@ -17,18 +18,21 @@
 #include "BatteryController.h"
 #include "ButtonController.h"
 #include "DisplayController.h"
+#include "RemoteLogger.h"
 
 TaskManager taskManager;
 
+// order: see TaskIds.h
 TimeController timeController;
 ButtonController buttonController;
 BrightnessController brightnessController;
 LedController ledController;
 RelaisController relaisController;
-PanelAngleController panelAngleController(&brightnessController, &relaisController, &ledController, &timeController);
-BatteryController batteryController(&ledController, &relaisController);
-PumpController pumpController(&relaisController, &ledController, &batteryController, &brightnessController, &timeController);
-DisplayController displayController(&buttonController, &brightnessController, &batteryController, &panelAngleController, &pumpController, &timeController);
+PanelAngleController panelAngleController;
+BatteryController batteryController;
+PumpController pumpController;
+DisplayController displayController;
+RemoteLogger remoteLogger;
 
 void setup() {
   LOG_INIT();
@@ -44,6 +48,7 @@ void setup() {
   taskManager.registerTask(&batteryController);
   taskManager.registerTask(&pumpController);
   taskManager.registerTask(&displayController);
+  taskManager.registerTask(&remoteLogger);
 
   taskManager.init();
 }

@@ -4,21 +4,24 @@
 #include <TimeLib.h>
 #include <math.h>
 
-DisplayController::DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController, TimeController* timeController) : AbstractIntervalTask(1000) {
-  this->buttonController = buttonController;
-  this->brightnessController = brightnessController;
-  this->batteryController = batteryController;
-  this->panelAngleController = panelAngleController;
-  this->pumpController = pumpController;
-  this->timeController = timeController;
-  
-  this->buttonController->setButtonHandler(this);
+#include "TaskIDs.h"
+
+#include "ButtonController.h"
+#include "BrightnessController.h"
+#include "BatteryController.h"
+#include "PanelAngleController.h"
+#include "PumpController.h"
+#include "TimeController.h"
+
+DisplayController::DisplayController() : AbstractIntervalTask(1000) {
 }
 
 DisplayController::~DisplayController() {
 }
 
 void DisplayController::init() {
+  taskManager->getTask<ButtonController*>(TASK_BUTTON_CONTROLLER)->setButtonHandler(this);
+
   ledControl.shutdown(DEFAULT_DISPLAY_ADDR, false);
   ledControl.setIntensity(DEFAULT_DISPLAY_ADDR, DISPLAY_BRIGHTNESS);
   ledControl.clearDisplay(DEFAULT_DISPLAY_ADDR);
@@ -37,7 +40,7 @@ void DisplayController::updateDisplay() {
 
   switch(displayContent) {
     case DC_TIME: {
-      TimeController::TIME_STATE ts = timeController->getState();
+      TimeController::TIME_STATE ts = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->getState();
       if (ts==TimeController::TIME_INIT) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 5, 'n', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'o', false);
@@ -52,7 +55,7 @@ void DisplayController::updateDisplay() {
         if (minute()<10) printNumber(DEFAULT_DISPLAY_ADDR, 0, 1);
         printNumber(DEFAULT_DISPLAY_ADDR, minute(), 0);
 
-        bool hasDCF77Signal = timeController->hasDCF77Signal();
+        bool hasDCF77Signal = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->hasDCF77Signal();
 
         if (ts==TimeController::TIME_DCF77) {
           ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'C', false);
@@ -67,14 +70,14 @@ void DisplayController::updateDisplay() {
     case DC_BRIGHTNESS:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x05);
-      printNumber(DEFAULT_DISPLAY_ADDR, brightnessController->getSensorValue(), 0);
+      printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getSensorValue(), 0);
       break;
     case DC_BATTERY:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
-      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', batteryController->isBatteryCritical());
+      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryCritical());
 
       //printNumber(DEFAULT_DISPLAY_ADDR, (float)12.34, 0);
-      printNumber(DEFAULT_DISPLAY_ADDR, batteryController->getVoltage(), 0);
+      printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->getVoltage(), 0);
 
       break;
     case DC_PANEL_ANGLE: {
@@ -82,11 +85,11 @@ void DisplayController::updateDisplay() {
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', false);
       bool printCountdown = true;
       
-      if (panelAngleController->getMotorState()<0) {
+      if (taskManager->getTask<PanelAngleController*>(TASK_PANEL_ANGLE_CONTROLLER)->getMotorState()<0) {
         ledControl.setRow(DEFAULT_DISPLAY_ADDR,4,0x3e);     //u
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
         //ledControl.setRow(DEFAULT_DISPLAY_ADDR,3,0x67);     //p
-      } else if (panelAngleController->getMotorState()>0) {
+      } else if (taskManager->getTask<PanelAngleController*>(TASK_PANEL_ANGLE_CONTROLLER)->getMotorState()>0) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 4, 'd', false);
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, ' ', false);
         //ledControl.setRow(DEFAULT_DISPLAY_ADDR, 3, 0x1d);   // o
@@ -98,24 +101,24 @@ void DisplayController::updateDisplay() {
       }
 
       if (printCountdown) {
-        int v = panelAngleController->getAdjustTimeoutProgress();
+        int v = taskManager->getTask<PanelAngleController*>(TASK_PANEL_ANGLE_CONTROLLER)->getAdjustTimeoutProgress();
         if (v>99) v = 99;
         printNumber(DEFAULT_DISPLAY_ADDR, 3, v);
       }
 
-      ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 0, panelAngleController->getState(), false);
+      ledControl.setDigit(DEFAULT_DISPLAY_ADDR, 0, taskManager->getTask<PanelAngleController*>(TASK_PANEL_ANGLE_CONTROLLER)->getState(), false);
       break;
     }
     case DC_PUMP:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);
 
-      if (pumpController->hasOverride()) {
+      if (taskManager->getTask<PumpController*>(TASK_PUMP_CONTROLLER)->hasOverride()) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, 'o', false);
       } else {
-        printNumber(DEFAULT_DISPLAY_ADDR, pumpController->getRemainingMinutes(), 3);
+        printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<PumpController*>(TASK_PUMP_CONTROLLER)->getRemainingMinutes(), 3);
       }
-      printBool(DEFAULT_DISPLAY_ADDR, pumpController->getState(), 0);
+      printBool(DEFAULT_DISPLAY_ADDR, taskManager->getTask<PumpController*>(TASK_PUMP_CONTROLLER)->getState(), 0);
       break;
   }
 }
@@ -246,10 +249,10 @@ void DisplayController::onUpDown(bool isDown, int dir) {
     case DC_BATTERY:
       break;
     case DC_PANEL_ANGLE:
-      panelAngleController->overrideMotorState(isDown, directionUp);
+      taskManager->getTask<PanelAngleController*>(TASK_PANEL_ANGLE_CONTROLLER)->overrideMotorState(isDown, directionUp);
       break;
     case DC_PUMP:
-      pumpController->overrideState(isDown, directionUp);
+      taskManager->getTask<PumpController*>(TASK_PUMP_CONTROLLER)->overrideState(isDown, directionUp);
       break;
   }
 }

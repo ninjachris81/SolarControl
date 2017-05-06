@@ -1,9 +1,13 @@
 #include "BatteryController.h"
-#include <LogHelper.h>
+#include "LedController.h"
+#include "RelaisController.h"
 
-BatteryController::BatteryController(LedController* ledController, RelaisController* relaisController) : AbstractIntervalTask(UPDATE_BATTERY_INTERVAL_MS) {
-  this->ledController = ledController;
-  this->relaisController = relaisController;
+#include <LogHelper.h>
+#include <TaskManager.h>
+
+#include "TaskIDs.h"
+
+BatteryController::BatteryController() : AbstractIntervalTask(UPDATE_BATTERY_INTERVAL_MS) {
 }
 
 BatteryController::~BatteryController() {
@@ -37,11 +41,11 @@ void BatteryController::update() {
     switch(battState) {
       case BATT_OK:
         LOG_PRINTLN(F("USING BATT"));
-        ledController->setState(INDEX_LED_BATT_STATE, LedController::LED_OFF);
+        taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_BATT_STATE, LedController::LED_OFF);
         break;
       case BATT_CRITICAL:
         LOG_PRINTLN(F("BATT CRITICAL"));
-        ledController->setState(INDEX_LED_BATT_STATE, LedController::LED_BLINK);
+        taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_BATT_STATE, LedController::LED_BLINK);
         break;
     }
   }

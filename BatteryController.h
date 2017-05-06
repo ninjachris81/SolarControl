@@ -10,8 +10,6 @@
 #include <AbstractIntervalTask.h>
 #include <SmoothValue.h>
 
-#include "LedController.h"
-#include "RelaisController.h"
 #include "Pins.h"
 #include "Debug.h"
 
@@ -33,7 +31,7 @@
 
 class BatteryController : public AbstractIntervalTask {
 public:
-    BatteryController(LedController* ledController, RelaisController* relaisController);
+    BatteryController();
     virtual ~BatteryController();
 
   enum BATT_STATE {
@@ -53,9 +51,6 @@ public:
 private:
   SmoothValue currentVoltage;
   BATT_STATE battState = BATT_INIT;
-
-  LedController* ledController;
-  RelaisController* relaisController;
 };
 
 #endif /* BATTERYCONTROLLER_H */

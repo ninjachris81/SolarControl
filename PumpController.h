@@ -9,11 +9,6 @@
 
 #include <AbstractIntervalTask.h>
 
-#include "RelaisController.h"
-#include "LedController.h"
-#include "BatteryController.h"
-#include "BrightnessController.h"
-#include "TimeController.h"
 #include "Pins.h"
 #include "Debug.h"
 
@@ -31,7 +26,7 @@
 
 class PumpController : public AbstractIntervalTask {
 public:
-    PumpController(RelaisController* relaisController, LedController* ledController, BatteryController* batteryController, BrightnessController* brightnessController, TimeController* timeController);
+    PumpController();
     virtual ~PumpController();
 
     void init();
@@ -53,13 +48,6 @@ private:
 
   bool pumpOn = false;
   unsigned long lastToggle = 0;
-  
-  RelaisController* relaisController;
-  LedController* ledController;
-  BatteryController* batteryController;
-  BrightnessController* brightnessController;
-  TimeController* timeController;
-
 };
 
 #endif /* PUMPCONTROLLER_H */

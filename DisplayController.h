@@ -11,13 +11,6 @@
 #include <AbstractIntervalTask.h>
 #include <FiveKeysHandler.h>
 
-#include "ButtonController.h"
-#include "BrightnessController.h"
-#include "BatteryController.h"
-#include "PanelAngleController.h"
-#include "PumpController.h"
-#include "TimeController.h"
-
 #include "Debug.h"
 #include "Pins.h"
 
@@ -44,7 +37,7 @@ public:
     DC_MIN = DC_TIME
   };
 
-    DisplayController(ButtonController* buttonController, BrightnessController* brightnessController, BatteryController* batteryController, PanelAngleController* panelAngleController, PumpController* pumpController, TimeController* timeController);
+    DisplayController();
     virtual ~DisplayController();
 
     void init();
@@ -58,13 +51,6 @@ public:
     void onPressed(bool isDown);
     
 private:
-  ButtonController* buttonController;
-  BrightnessController* brightnessController;
-  BatteryController* batteryController;
-  PanelAngleController* panelAngleController;
-  PumpController* pumpController;
-  TimeController* timeController;
-
   void printNumber(int addr, int v, uint8_t offset);
   void printNumber(int addr, int v, uint8_t offset, bool withDot);
   void printNumber(int addr, float v, uint8_t offset);
