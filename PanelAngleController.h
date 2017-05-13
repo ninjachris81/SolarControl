@@ -26,13 +26,14 @@
 #else
   #define LAST_STATES_MIN_COUNT 180   // -> every 6 minutes
   #define LAST_STATES_LIMIT 220
-  #define ADJUST_COUNTDOWN_SMALL 40.0
-  #define ADJUST_COUNTDOWN_BIG 70.0
-  #define INIT_SETUP_TIMEOUT 200.0 // 3 min down
+  #define ADJUST_COUNTDOWN_SMALL 30.0
+  #define ADJUST_COUNTDOWN_BIG 140.0
+  #define INIT_SETUP_TIMEOUT 300.0 // 3 min down
 #endif
 
 #define BRIGHTNESS_GLOBAL_THRESHOLD 30
-#define UP_FACTOR 1.2       // up is slower -> need more time
+#define UP_FACTOR 1.29       // up is slower -> need more time
+#define END_PLUS 30       // for end states
 
 class PanelAngleController : public AbstractIntervalTask {
 public:
@@ -78,8 +79,8 @@ private:
   uint8_t lastStatesCount = 0;
   
   bool isAdjustingAngle = true;
-  uint8_t adjustCountdown = INIT_SETUP_TIMEOUT;
-  uint8_t orgAdjustCountdown = INIT_SETUP_TIMEOUT;
+  uint16_t adjustCountdown = INIT_SETUP_TIMEOUT;
+  uint16_t orgAdjustCountdown = INIT_SETUP_TIMEOUT;
 
 };
 

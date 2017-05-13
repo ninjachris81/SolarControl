@@ -14,14 +14,18 @@
 
 #ifdef IS_DEBUG
   #define UPDATE_PUMP_INTERVAL_MS 1000
-  #define PUMP_STANDBY_INTERVAL_ON_MS 5000
+  #define PUMP_STANDBY_INTERVAL_ON_MIN_MS 6000
+  #define PUMP_STANDBY_INTERVAL_ON_MAX_MS 24000
   #define PUMP_STANDBY_INTERVAL_OFF_MS 10000
   #define PUMP_TIMEOUT 3
+  #define PUMP_STANDBY_DELTA_CHANGE 100
 #else
   #define UPDATE_PUMP_INTERVAL_MS 10000
-  #define PUMP_STANDBY_INTERVAL_ON_MS 120000   // 2 min
+  #define PUMP_STANDBY_INTERVAL_ON_MIN_MS 60000   // 1 min
+  #define PUMP_STANDBY_INTERVAL_ON_MAX_MS 240000   // 4 min
   #define PUMP_STANDBY_INTERVAL_OFF_MS 1200000   // 20 min
   #define PUMP_TIMEOUT 6
+  #define PUMP_STANDBY_DELTA_CHANGE 1000      // 30 minutes MAX<->MIN
 #endif
 
 class PumpController : public AbstractIntervalTask {
@@ -45,6 +49,7 @@ public:
 
 private:
   bool isOverride = false;
+  unsigned long currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;
 
   bool pumpOn = false;
   unsigned long lastToggle = 0;

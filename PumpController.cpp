@@ -27,13 +27,19 @@ void PumpController::update() {
   if ((timeController->getHourOfDay()<=6 && timeController->getHourOfDay()>=0) || timeController->getHourOfDay()>=20) {
     LOG_PRINT(F("It's night"));
     doStandby = true;
-  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark()) {
+    currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;
+  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark() && !taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
     LOG_PRINT(F("It's dark"));
     doStandby = true;
+    if (currentStandbyOnIntervalMs>PUMP_STANDBY_INTERVAL_ON_MIN_MS) currentStandbyOnIntervalMs -=PUMP_STANDBY_DELTA_CHANGE;
+  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
+    LOG_PRINT(F("It's day"));
+    doStandby = true;
+    if (currentStandbyOnIntervalMs<PUMP_STANDBY_INTERVAL_ON_MAX_MS) currentStandbyOnIntervalMs+=PUMP_STANDBY_DELTA_CHANGE;
   }
 
   if (doStandby) {
-    if (lastToggle==0 || (pumpOn && (millis() - lastToggle > PUMP_STANDBY_INTERVAL_ON_MS))) {
+    if (lastToggle==0 || (pumpOn && (millis() - lastToggle > currentStandbyOnIntervalMs))) {
       LOG_PRINTLN(F("Pump intv off"));
       setState(false);
       lastToggle = millis();      

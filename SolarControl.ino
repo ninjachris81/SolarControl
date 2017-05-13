@@ -1,3 +1,8 @@
+/* META INFOS
+target_package=arduino
+target_platform=avr
+board=nano
+*/
 #include <LedControl.h>
 #include <TimeLib.h>
 #include <DCF77.h>
@@ -22,7 +27,6 @@
 
 TaskManager taskManager;
 
-// order: see TaskIds.h
 TimeController timeController;
 ButtonController buttonController;
 BrightnessController brightnessController;

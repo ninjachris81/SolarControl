@@ -100,7 +100,9 @@ void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {
   int directionFactor = state - currentState;
   float c = 0.0;
 
-  if (state==AS_EAST || currentState==AS_EAST) {
+  if (abs(directionFactor)==2) {
+    c = ADJUST_COUNTDOWN_BIG + ADJUST_COUNTDOWN_SMALL;
+  } else if (state==AS_EAST || currentState==AS_EAST) {
     c = ADJUST_COUNTDOWN_BIG;
   } else {
     c = ADJUST_COUNTDOWN_SMALL;
@@ -109,6 +111,8 @@ void PanelAngleController::setState(PanelAngleController::ANGLE_STATE state) {
   if (directionFactor>0) {    // up
     c = c * UP_FACTOR;
   }
+
+  if (state==AS_EAST || state==AS_DEFAULT) c+=END_PLUS;
 
   adjustCountdown = c;
   orgAdjustCountdown = adjustCountdown;
