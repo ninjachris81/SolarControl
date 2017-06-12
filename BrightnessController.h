@@ -19,8 +19,8 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
 #endif
 
-#define BRIGHTNESS_DARK_LEVEL 30
-#define BRIGHTNESS_DAY_LEVEL 20
+#define BRIGHTNESS_DARK_LEVEL 35
+#define BRIGHTNESS_DAY_LEVEL 25
 
 class BrightnessController : public AbstractIntervalTask {
 public:
@@ -38,7 +38,7 @@ public:
     bool isDay();
 
 private:
-  SmoothValue sensorValue = SmoothValue(-1.0);
+  SmoothValue sensorValue = SmoothValue(20, -1.0);
 
 };
 

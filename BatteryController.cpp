@@ -52,6 +52,10 @@ void BatteryController::update() {
 }
 
 bool BatteryController::isBatteryCritical() {
-  return getVoltage()<CRITICAL_BATTERY_VOLTAGE;
+  return getVoltage()<BATTERY_VOLTAGE_CRITICAL;
+}
+
+bool BatteryController::isBatteryFull() {
+  return getVoltage()>=BATTERY_VOLTAGE_FULL;
 }
 

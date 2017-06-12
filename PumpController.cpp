@@ -25,20 +25,34 @@ void PumpController::update() {
   TimeController* timeController = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER);
   
   if ((timeController->getHourOfDay()<=6 && timeController->getHourOfDay()>=0) || timeController->getHourOfDay()>=20) {
-    LOG_PRINT(F("It's night"));
+    LOG_PRINTLN(F("It's night"));
     doStandby = true;
     currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;
   } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark() && !taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
-    LOG_PRINT(F("It's dark"));
+    LOG_PRINTLN(F("It's dark"));
     doStandby = true;
     if (currentStandbyOnIntervalMs>PUMP_STANDBY_INTERVAL_ON_MIN_MS) currentStandbyOnIntervalMs -=PUMP_STANDBY_DELTA_CHANGE;
   } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
-    LOG_PRINT(F("It's day"));
-    doStandby = true;
-    if (currentStandbyOnIntervalMs<PUMP_STANDBY_INTERVAL_ON_MAX_MS) currentStandbyOnIntervalMs+=PUMP_STANDBY_DELTA_CHANGE;
+    if (taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryFull()) {
+      LOG_PRINTLN(F("Battery full"));
+      batteryFullTimeout = BATTERY_FULL_TIMEOUT;
+    } else {
+      if (batteryFullTimeout>0) {
+        batteryFullTimeout--;
+        LOG_PRINTLN(F("Battery full timeout"));
+      } else {
+        LOG_PRINTLN(F("It's day"));
+        doStandby = true;
+        if (currentStandbyOnIntervalMs<PUMP_STANDBY_INTERVAL_ON_MAX_MS) currentStandbyOnIntervalMs+=PUMP_STANDBY_DELTA_CHANGE;
+      }
+    }
+  } else {
+    // it's bright
   }
 
   if (doStandby) {
+    batteryFullTimeout = 0;
+    
     if (lastToggle==0 || (pumpOn && (millis() - lastToggle > currentStandbyOnIntervalMs))) {
       LOG_PRINTLN(F("Pump intv off"));
       setState(false);

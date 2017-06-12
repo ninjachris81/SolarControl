@@ -27,7 +27,8 @@
 #define R1 29700.0
 #define R2 7430.0
 
-#define CRITICAL_BATTERY_VOLTAGE 11.5
+#define BATTERY_VOLTAGE_CRITICAL 11.5
+#define BATTERY_VOLTAGE_FULL 13.95
 
 class BatteryController : public AbstractIntervalTask {
 public:
@@ -45,6 +46,8 @@ public:
     void update();
 
     bool isBatteryCritical();
+
+    bool isBatteryFull();
 
     float getVoltage();
 

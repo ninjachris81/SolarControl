@@ -23,7 +23,7 @@ board=nano
 #include "BatteryController.h"
 #include "ButtonController.h"
 #include "DisplayController.h"
-#include "RemoteLogger.h"
+//#include "RemoteLogger.h"
 
 TaskManager taskManager;
 
@@ -36,7 +36,7 @@ PanelAngleController panelAngleController;
 BatteryController batteryController;
 PumpController pumpController;
 DisplayController displayController;
-RemoteLogger remoteLogger;
+//RemoteLogger remoteLogger;
 
 void setup() {
   LOG_INIT();
@@ -52,7 +52,7 @@ void setup() {
   taskManager.registerTask(&batteryController);
   taskManager.registerTask(&pumpController);
   taskManager.registerTask(&displayController);
-  taskManager.registerTask(&remoteLogger);
+  //taskManager.registerTask(&remoteLogger);
 
   taskManager.init();
 }

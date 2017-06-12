@@ -7,9 +7,16 @@
 #include "WProgram.h"
 #endif
 
+#include "Debug.h"
+
 #include <AbstractIntervalTask.h>
 
-#define LOGGER_INTERVAL_MS 10000
+#ifdef IS_DEBUG
+  #define LOGGER_INTERVAL_MS 2000
+#else
+  #define LOGGER_INTERVAL_MS 10000
+#endif
+
 
 class RemoteLogger : public AbstractIntervalTask {
 public:

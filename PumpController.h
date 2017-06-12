@@ -19,6 +19,7 @@
   #define PUMP_STANDBY_INTERVAL_OFF_MS 10000
   #define PUMP_TIMEOUT 3
   #define PUMP_STANDBY_DELTA_CHANGE 100
+  #define BATTERY_FULL_TIMEOUT 3
 #else
   #define UPDATE_PUMP_INTERVAL_MS 10000
   #define PUMP_STANDBY_INTERVAL_ON_MIN_MS 60000   // 1 min
@@ -26,6 +27,7 @@
   #define PUMP_STANDBY_INTERVAL_OFF_MS 1200000   // 20 min
   #define PUMP_TIMEOUT 6
   #define PUMP_STANDBY_DELTA_CHANGE 1000      // 30 minutes MAX<->MIN
+  #define BATTERY_FULL_TIMEOUT 6
 #endif
 
 class PumpController : public AbstractIntervalTask {
@@ -50,6 +52,7 @@ public:
 private:
   bool isOverride = false;
   unsigned long currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;
+  uint8_t batteryFullTimeout = 0;
 
   bool pumpOn = false;
   unsigned long lastToggle = 0;
