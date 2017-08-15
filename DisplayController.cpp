@@ -72,6 +72,11 @@ void DisplayController::updateDisplay() {
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x05);
       printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getSensorValue(), 0);
       break;
+    case DC_DARK_LEVEL:
+      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'D', false);
+      ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0xe);   // L
+      printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getDarkLevel(), 0);
+      break;
     case DC_BATTERY:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 6, 'a', taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryCritical());
@@ -111,7 +116,7 @@ void DisplayController::updateDisplay() {
     }
     case DC_PUMP:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'p', false);
-      ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);
+      ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0x1c);     // u
 
       if (taskManager->getTask<PumpController*>(TASK_PUMP_CONTROLLER)->hasOverride()) {
         ledControl.setChar(DEFAULT_DISPLAY_ADDR, 3, 'o', false);
@@ -124,6 +129,13 @@ void DisplayController::updateDisplay() {
 }
 
 void DisplayController::printBool(int addr, bool v, uint8_t offset) {
+  if (v) {
+    ledControl.setChar(addr, offset, '1', false);
+  } else {
+    ledControl.setChar(addr, offset, '0', false);
+  }
+
+  /*
   ledControl.setChar(addr, offset+2, '0', false);
   if (v) {
     ledControl.setChar(addr, offset+1, 'n', false);
@@ -131,7 +143,7 @@ void DisplayController::printBool(int addr, bool v, uint8_t offset) {
   } else {
     ledControl.setChar(addr, offset+1, 'f', false);
     ledControl.setChar(addr, offset, 'f', false);
-  }
+  }*/
 }
 
 void DisplayController::printNumber(int addr, int v, uint8_t offset) {

@@ -39,11 +39,11 @@ public:
     
     void update();
 
-    void setState(bool pumpOn);
+    void setState(bool doPumpOn);
 
     bool getState();
 
-    void overrideState(bool isOverride, bool pumpOn);
+    void overrideState(bool isOverride, bool doPumpOn);
 
     bool hasOverride();
 

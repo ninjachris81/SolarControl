@@ -30,6 +30,7 @@ public:
   enum DISPLAY_CONTENT {
     DC_TIME,
     DC_BRIGHTNESS,
+    DC_DARK_LEVEL,
     DC_BATTERY,
     DC_PANEL_ANGLE,
     DC_PUMP,

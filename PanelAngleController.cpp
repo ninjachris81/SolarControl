@@ -26,15 +26,8 @@ void PanelAngleController::update() {
 
 void PanelAngleController::checkNewState() {
   PanelAngleController::ANGLE_STATE newState = AS_DEFAULT;
-  
-  int brightness = taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getSensorValue();
 
-#ifdef IS_DEBUG
-  LOG_PRINT(F("Brightness: "));
-  LOG_PRINTLNF(brightness, DEC);
-#endif
-
-  if (brightness<BRIGHTNESS_GLOBAL_THRESHOLD) {
+  if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
 
     if (taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->getState()!=TimeController::TIME_INIT) {
       uint8_t h = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER)->getHourOfDay();

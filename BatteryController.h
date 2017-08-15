@@ -27,7 +27,7 @@
 #define R1 29700.0
 #define R2 7430.0
 
-#define BATTERY_VOLTAGE_CRITICAL 11.5
+#define BATTERY_VOLTAGE_CRITICAL 11.8
 #define BATTERY_VOLTAGE_FULL 13.95
 
 class BatteryController : public AbstractIntervalTask {

@@ -2,6 +2,8 @@
 #include <LogHelper.h>
 
 BrightnessController::BrightnessController() : AbstractIntervalTask(UPDATE_BRIGHTNESS_INTERVAL_MS) {
+  darkLevel = BRIGHTNESS_DARK_LEVEL;
+  dayLevel = BRIGHTNESS_DAY_LEVEL;
 }
 
 BrightnessController::~BrightnessController() {
@@ -19,9 +21,28 @@ int BrightnessController::getSensorValue() {
 }
 
 bool BrightnessController::isDark() {
-  return getSensorValue()>BRIGHTNESS_DARK_LEVEL;
+  return getSensorValue()>darkLevel;
 }
 
 bool BrightnessController::isDay() {
-  return getSensorValue()>BRIGHTNESS_DAY_LEVEL;
+  return getSensorValue()>dayLevel;
+}
+
+void BrightnessController::adjustLevels(bool darker) {
+  if (darker) {
+    darkLevel+=ADJUST_DELTA_UP;
+    dayLevel+=ADJUST_DELTA_UP;
+  } else {
+    if (darkLevel<=BRIGHTNESS_DARK_LEVEL || dayLevel<=BRIGHTNESS_DAY_LEVEL) return;
+    darkLevel-=ADJUST_DELTA_DOWN;
+    dayLevel-=ADJUST_DELTA_DOWN;
+  }
+}
+
+float BrightnessController::getDarkLevel() {
+  return darkLevel;
+}
+
+float BrightnessController::getDayLevel() {
+  return dayLevel;
 }

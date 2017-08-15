@@ -21,6 +21,8 @@ void PumpController::init() {
 void PumpController::update() {
   if (isOverride) return;
   bool doStandby = false;
+  bool doAdjustLevels = false;
+  bool adjustLevels = false;
 
   TimeController* timeController = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER);
   
@@ -31,11 +33,14 @@ void PumpController::update() {
   } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark() && !taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
     LOG_PRINTLN(F("It's dark"));
     doStandby = true;
+    doAdjustLevels = true;
     if (currentStandbyOnIntervalMs>PUMP_STANDBY_INTERVAL_ON_MIN_MS) currentStandbyOnIntervalMs -=PUMP_STANDBY_DELTA_CHANGE;
   } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
     if (taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryFull()) {
       LOG_PRINTLN(F("Battery full"));
       batteryFullTimeout = BATTERY_FULL_TIMEOUT;
+      adjustLevels = true;
+      doAdjustLevels = true;
     } else {
       if (batteryFullTimeout>0) {
         batteryFullTimeout--;
@@ -49,6 +54,8 @@ void PumpController::update() {
   } else {
     // it's bright
   }
+
+  if (doAdjustLevels) taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->adjustLevels(adjustLevels);
 
   if (doStandby) {
     batteryFullTimeout = 0;
@@ -71,34 +78,34 @@ bool PumpController::hasOverride() {
   return isOverride;
 }
 
-void PumpController::overrideState(bool isOverride, bool pumpOn) {
+void PumpController::overrideState(bool isOverride, bool doPumpOn) {
   this->isOverride = isOverride;
-  setState(pumpOn);
+  setState(doPumpOn);
 }
 
-void PumpController::setState(bool pumpOn) {
+void PumpController::setState(bool doPumpOn) {
   if (isOverride) {
     LOG_PRINTLN(F("OVERRIDE - ignoring pump"));
     return;
   }
 
-  if (pumpOn && taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryCritical()) {
+  if (doPumpOn && taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryCritical()) {
     LOG_PRINTLN(F("Batt critical - ignoring pump on"));
-    return;
+    doPumpOn = false;
   }
   
-  if (this->pumpOn==pumpOn) return;
+  if (this->pumpOn==doPumpOn) return;
   
   LOG_PRINT(F("Setting pump state to "));
-  LOG_PRINTLN(pumpOn);
+  LOG_PRINTLN(doPumpOn);
   
-  this->pumpOn = pumpOn;
-  taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_PUMP_STATE, pumpOn ? LedController::LED_ON : LedController::LED_OFF);
-  taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_PUMP, pumpOn);
+  this->pumpOn = doPumpOn;
+  taskManager->getTask<LedController*>(TASK_LED_CONTROLLER)->setState(INDEX_LED_PUMP_STATE, this->pumpOn ? LedController::LED_ON : LedController::LED_OFF);
+  taskManager->getTask<RelaisController*>(TASK_RELAIS_CONTROLLER)->setState(PIN_RELAIS_PUMP, this->pumpOn);
 }
 
 bool PumpController::getState() {
-  return pumpOn;
+  return this->pumpOn;
 }
 
 int PumpController::getRemainingMinutes() {

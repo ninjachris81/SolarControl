@@ -19,8 +19,11 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
 #endif
 
-#define BRIGHTNESS_DARK_LEVEL 35
-#define BRIGHTNESS_DAY_LEVEL 25
+#define BRIGHTNESS_DARK_LEVEL 35.0
+#define BRIGHTNESS_DAY_LEVEL 25.0
+
+#define ADJUST_DELTA_UP 0.1
+#define ADJUST_DELTA_DOWN 0.001
 
 class BrightnessController : public AbstractIntervalTask {
 public:
@@ -37,8 +40,17 @@ public:
 
     bool isDay();
 
+    void adjustLevels(bool darker);
+
+    float getDarkLevel();
+
+    float getDayLevel();
+
 private:
   SmoothValue sensorValue = SmoothValue(20, -1.0);
+
+  float darkLevel;
+  float dayLevel;
 
 };
 
