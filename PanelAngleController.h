@@ -27,7 +27,7 @@
   #define LAST_STATES_MIN_COUNT 180   // -> every 6 minutes
   #define LAST_STATES_LIMIT 200
   #define ADJUST_COUNTDOWN_SMALL 30.0
-  #define ADJUST_COUNTDOWN_BIG 140.0
+  #define ADJUST_COUNTDOWN_BIG 130.0
   #define INIT_SETUP_TIMEOUT 300.0 // 3 min down
 #endif
 

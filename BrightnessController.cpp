@@ -25,7 +25,7 @@ bool BrightnessController::isDark() {
 }
 
 bool BrightnessController::isDay() {
-  return getSensorValue()>dayLevel;
+  return getSensorValue()<dayLevel;
 }
 
 void BrightnessController::adjustLevels(bool darker) {

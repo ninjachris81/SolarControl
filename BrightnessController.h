@@ -20,10 +20,10 @@
 #endif
 
 #define BRIGHTNESS_DARK_LEVEL 35.0
-#define BRIGHTNESS_DAY_LEVEL 25.0
+#define BRIGHTNESS_DAY_LEVEL 200.0
 
 #define ADJUST_DELTA_UP 0.1
-#define ADJUST_DELTA_DOWN 0.001
+#define ADJUST_DELTA_DOWN 0.005
 
 class BrightnessController : public AbstractIntervalTask {
 public:
