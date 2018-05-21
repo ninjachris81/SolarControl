@@ -19,8 +19,12 @@
   #define UPDATE_BRIGHTNESS_INTERVAL_MS 5000
 #endif
 
-#define BRIGHTNESS_DARK_LEVEL 35.0
-#define BRIGHTNESS_DAY_LEVEL 200.0
+#define BRIGHTNESS_BRIGHT_LEVEL 15.0
+
+#define BRIGHTNESS_BRIGHT_LEVEL_MIN 10.0
+#define BRIGHTNESS_BRIGHT_LEVEL_MAX 35.0
+
+#define BRIGHTNESS_BRIGHT_LEVEL_DAY_ADD 120.0
 
 #define ADJUST_DELTA_UP 0.1
 #define ADJUST_DELTA_DOWN 0.005
@@ -36,21 +40,18 @@ public:
 
     int getSensorValue();
 
-    bool isDark();
+    bool isBright();
 
     bool isDay();
 
-    void adjustLevels(bool darker);
+    void adjustLevels(bool brighter);
 
-    float getDarkLevel();
-
-    float getDayLevel();
+    float getBrightLevel();
 
 private:
   SmoothValue sensorValue = SmoothValue(20, -1.0);
 
-  float darkLevel;
-  float dayLevel;
+  float brightLevel;
 
 };
 

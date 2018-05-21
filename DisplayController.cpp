@@ -73,9 +73,9 @@ void DisplayController::updateDisplay() {
       printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getSensorValue(), 0);
       break;
     case DC_DARK_LEVEL:
-      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'D', false);
+      ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);
       ledControl.setRow(DEFAULT_DISPLAY_ADDR,6,0xe);   // L
-      printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getDarkLevel(), 0);
+      printNumber(DEFAULT_DISPLAY_ADDR, taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->getBrightLevel(), 0);
       break;
     case DC_BATTERY:
       ledControl.setChar(DEFAULT_DISPLAY_ADDR, 7, 'b', false);

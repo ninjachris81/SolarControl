@@ -2,8 +2,7 @@
 #include <LogHelper.h>
 
 BrightnessController::BrightnessController() : AbstractIntervalTask(UPDATE_BRIGHTNESS_INTERVAL_MS) {
-  darkLevel = BRIGHTNESS_DARK_LEVEL;
-  dayLevel = BRIGHTNESS_DAY_LEVEL;
+  brightLevel = BRIGHTNESS_BRIGHT_LEVEL;
 }
 
 BrightnessController::~BrightnessController() {
@@ -20,29 +19,24 @@ int BrightnessController::getSensorValue() {
   return sensorValue.getValue();
 }
 
-bool BrightnessController::isDark() {
-  return getSensorValue()>darkLevel;
+bool BrightnessController::isBright() {
+  return getSensorValue() < BRIGHTNESS_BRIGHT_LEVEL;
 }
 
 bool BrightnessController::isDay() {
-  return getSensorValue()<dayLevel;
+  return getSensorValue() < (BRIGHTNESS_BRIGHT_LEVEL + BRIGHTNESS_BRIGHT_LEVEL_DAY_ADD);
 }
 
-void BrightnessController::adjustLevels(bool darker) {
-  if (darker) {
-    darkLevel+=ADJUST_DELTA_UP;
-    dayLevel+=ADJUST_DELTA_UP;
+void BrightnessController::adjustLevels(bool brighter) {
+  if (brighter) {
+    brightLevel-=ADJUST_DELTA_UP;
   } else {
-    if (darkLevel<=BRIGHTNESS_DARK_LEVEL || dayLevel<=BRIGHTNESS_DAY_LEVEL) return;
-    darkLevel-=ADJUST_DELTA_DOWN;
-    dayLevel-=ADJUST_DELTA_DOWN;
+    brightLevel+=ADJUST_DELTA_DOWN;
   }
+
+  brightLevel = constrain(brightLevel, BRIGHTNESS_BRIGHT_LEVEL_MIN, BRIGHTNESS_BRIGHT_LEVEL_MAX);
 }
 
-float BrightnessController::getDarkLevel() {
-  return darkLevel;
-}
-
-float BrightnessController::getDayLevel() {
-  return dayLevel;
+float BrightnessController::getBrightLevel() {
+  return brightLevel;
 }

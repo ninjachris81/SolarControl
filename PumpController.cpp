@@ -22,40 +22,41 @@ void PumpController::update() {
   if (isOverride) return;
   bool doStandby = false;
   bool doAdjustLevels = false;
-  bool adjustLevels = false;
+  bool adjustLevelBrighter = false;
 
   TimeController* timeController = taskManager->getTask<TimeController*>(TASK_TIME_CONTROLLER);
   
   if ((timeController->getHourOfDay()<=6 && timeController->getHourOfDay()>=0) || timeController->getHourOfDay()>=20) {
     LOG_PRINTLN(F("It's night"));
     doStandby = true;
-    currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;
-  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDark() && !taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
-    LOG_PRINTLN(F("It's dark"));
-    doStandby = true;
-    doAdjustLevels = true;
-    if (currentStandbyOnIntervalMs>PUMP_STANDBY_INTERVAL_ON_MIN_MS) currentStandbyOnIntervalMs -=PUMP_STANDBY_DELTA_CHANGE;
-  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isDay()) {
-    if (taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryFull()) {
+    currentStandbyOnIntervalMs = PUMP_STANDBY_INTERVAL_ON_MIN_MS;   // at night, use min on time
+  } else if (taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->isBright()) {
+    LOG_PRINTLN(F("It's bright"));
+    doStandby = false;
+  } else if (taskManager->getTask<BatteryController*>(TASK_BATTERY_CONTROLLER)->isBatteryFull()) {
       LOG_PRINTLN(F("Battery full"));
       batteryFullTimeout = BATTERY_FULL_TIMEOUT;
-      adjustLevels = true;
+      adjustLevelBrighter = true;
       doAdjustLevels = true;
-    } else {
-      if (batteryFullTimeout>0) {
-        batteryFullTimeout--;
-        LOG_PRINTLN(F("Battery full timeout"));
-      } else {
-        LOG_PRINTLN(F("It's day"));
-        doStandby = true;
-        if (currentStandbyOnIntervalMs<PUMP_STANDBY_INTERVAL_ON_MAX_MS) currentStandbyOnIntervalMs+=PUMP_STANDBY_DELTA_CHANGE;
-      }
-    }
+  } else if (batteryFullTimeout>0) {
+      batteryFullTimeout--;
+      LOG_PRINTLN(F("Battery full decrease"));
   } else {
-    // it's bright
+    // it's normal
+    doStandby = true;
+    adjustLevelBrighter = false;
+    doAdjustLevels = true;
   }
 
-  if (doAdjustLevels) taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->adjustLevels(adjustLevels);
+  if (doAdjustLevels) {
+    taskManager->getTask<BrightnessController*>(TASK_BRIGHTNESS_CONTROLLER)->adjustLevels(adjustLevelBrighter);
+    if (adjustLevelBrighter) {
+      currentStandbyOnIntervalMs+=PUMP_STANDBY_DELTA_CHANGE;    // make on interval bigger
+    } else {
+      currentStandbyOnIntervalMs-=PUMP_STANDBY_DELTA_CHANGE;    // make on interval smaller
+    }
+    currentStandbyOnIntervalMs = constrain(currentStandbyOnIntervalMs, PUMP_STANDBY_INTERVAL_ON_MIN_MS, PUMP_STANDBY_INTERVAL_ON_MAX_MS);
+  }
 
   if (doStandby) {
     batteryFullTimeout = 0;
